@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Award, CheckCircle2, Clock, Filter, RotateCcw, XCircle } from 'lucide-react'
+import { Award, CheckCircle2, Clock, Filter, RotateCcw, Sparkles, XCircle } from 'lucide-react'
 import { DivaMascot } from '@/components/diva/DivaMascot'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -29,7 +29,7 @@ export const ResultReview: React.FC<ResultReviewProps> = ({
 }) => {
   const [filterMode, setFilterMode] = useState<'all' | 'wrong'>('all')
   const pct = result.total > 0 ? Math.round((result.score / result.total) * 100) : 0
-  const isHigh = pct >= 80
+  const pose = pct >= 85 ? 'cheering' : pct >= 60 ? 'excited' : 'determined'
 
   const filteredItems =
     filterMode === 'wrong' ? result.review.filter((r) => !r.is_correct) : result.review
@@ -40,18 +40,31 @@ export const ResultReview: React.FC<ResultReviewProps> = ({
   }
 
   return (
-    <div className="mx-auto max-w-3xl space-y-5 pb-12">
+    <div className="mx-auto max-w-3xl space-y-5 pb-12 animate-question-enter">
       {/* Celebration Card */}
-      <Card className="overflow-hidden border-2 border-diva-ink shadow-comic bg-diva-parchment">
-        <div className="bg-diva-red px-5 py-3 text-center text-white border-b-2 border-diva-ink">
-          <h2 className="font-display text-xl sm:text-2xl font-extrabold tracking-wide">
+      <Card className="relative overflow-hidden border-4 border-diva-ink shadow-comic bg-diva-parchment">
+        {pct >= 60 && (
+          <div className="pointer-events-none absolute inset-x-0 top-14 flex justify-around opacity-85">
+            {['#FFD54F', '#8BC34A', '#42A5F5', '#FF6F91', '#FF8A00'].map((color, idx) => (
+              <span
+                key={idx}
+                className="h-3 w-3 rounded-sm animate-confetti"
+                style={{ backgroundColor: color, animationDelay: `${idx * 0.35}s` }}
+              />
+            ))}
+          </div>
+        )}
+
+        <div className="bg-diva-red px-5 py-3 text-center text-white border-b-4 border-diva-ink">
+          <h2 className="font-display text-xl sm:text-2xl font-extrabold tracking-wide flex items-center justify-center gap-2">
+            <Sparkles className="h-5 w-5 text-diva-yellow" />
             HOÀN THÀNH HÀNH TRÌNH VISION 2035!
           </h2>
         </div>
 
         <CardContent className="p-5 sm:p-6">
           <div className="flex flex-col sm:flex-row items-center gap-5">
-            <DivaMascot pose={isHigh ? 'cheering' : 'determined'} size="lg" />
+            <DivaMascot pose={pose} size="lg" />
 
             <div className="flex-1 text-center sm:text-left space-y-3">
               <div>
@@ -85,19 +98,19 @@ export const ResultReview: React.FC<ResultReviewProps> = ({
 
               {/* Stage Breakdown */}
               <div className="grid grid-cols-3 gap-2 pt-1">
-                <div className="rounded-xl border border-diva-ink/20 bg-white p-2 text-center">
+                <div className="rounded-xl border-2 border-diva-ink/20 bg-white p-2 text-center shadow-sm">
                   <div className="text-[11px] font-bold text-muted-foreground">CHẶNG 1: LOOK</div>
                   <div className="font-display text-lg font-extrabold text-diva-ink">
                     {result.score_by_stage.LOOK}
                   </div>
                 </div>
-                <div className="rounded-xl border border-diva-ink/20 bg-white p-2 text-center">
+                <div className="rounded-xl border-2 border-diva-ink/20 bg-white p-2 text-center shadow-sm">
                   <div className="text-[11px] font-bold text-muted-foreground">CHẶNG 2: THINK</div>
                   <div className="font-display text-lg font-extrabold text-diva-blue">
                     {result.score_by_stage.THINK}
                   </div>
                 </div>
-                <div className="rounded-xl border border-diva-ink/20 bg-white p-2 text-center">
+                <div className="rounded-xl border-2 border-diva-ink/20 bg-white p-2 text-center shadow-sm">
                   <div className="text-[11px] font-bold text-muted-foreground">CHẶNG 3: CONNECT</div>
                   <div className="font-display text-lg font-extrabold text-diva-green">
                     {result.score_by_stage.CONNECT}
@@ -210,7 +223,7 @@ export const ResultReview: React.FC<ResultReviewProps> = ({
       </Card>
 
       <div className="flex justify-center">
-        <Button variant="comic" size="lg" onClick={onPlayAgain}>
+        <Button variant="comic" size="lg" className="btn-comic-shine" onClick={onPlayAgain}>
           <RotateCcw className="mr-2 h-4 w-4" />
           Quay về Màn hình Chính / Làm lượt ôn tập
         </Button>

@@ -1,32 +1,84 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { CheckCircle2, Eye, Sparkles, ZoomIn } from 'lucide-react'
-import { DivaMascot } from '@/components/diva/DivaMascot'
+import { DivaMascot, type DivaPose } from '@/components/diva/DivaMascot'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
-import type { SafeQuestion } from '@/types/quiz'
+import type { SafeQuestion, Stage } from '@/types/quiz'
 
 interface QuestionRendererProps {
   question: SafeQuestion
+  questionIndex?: number
   selectedKeys: string[]
+  changeCount?: number
   onSelect: (keys: string[]) => void
+}
+
+const IDLE_POSES_BY_STAGE: Record<Stage, DivaPose[]> = {
+  LOOK: ['explore', 'pointing', 'curious', 'surprised', 'presenting'],
+  THINK: ['thinking', 'curious', 'confused', 'determined', 'thinking'],
+  CONNECT: ['pointing', 'running', 'determined', 'curious'],
+}
+
+const ANSWERED_POSES: DivaPose[] = ['happy', 'excited', 'wink', 'laughing', 'cheering', 'presenting']
+
+const STAGE_MOOD_TIP: Record<Stage, string> = {
+  LOOK: 'Quan sát kỹ từng chi tiết nhé!',
+  THINK: 'Suy luận cùng DiVA nào!',
+  CONNECT: 'Liên hệ ngay công việc hằng ngày!',
 }
 
 export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
   question,
+  questionIndex = 0,
   selectedKeys,
+  changeCount = 0,
   onSelect,
 }) => {
   const [zoomUrl, setZoomUrl] = useState<string | null>(null)
   const [diffTab, setDiffTab] = useState<'A' | 'B'>('A')
+  const [isIdleLong, setIsIdleLong] = useState(false)
+  const [justChanged, setJustChanged] = useState(false)
+
+  // Reset idle timer when switching to a new question
+  useEffect(() => {
+    setIsIdleLong(false)
+    setJustChanged(false)
+    const timer = window.setTimeout(() => setIsIdleLong(true), 25000)
+    return () => window.clearTimeout(timer)
+  }, [question.question_code])
+
+  // Briefly react with surprised/determined when user changes their chosen answer
+  useEffect(() => {
+    if (changeCount <= 0) return
+    setJustChanged(true)
+    const t = window.setTimeout(() => setJustChanged(false), 1400)
+    return () => window.clearTimeout(t)
+  }, [changeCount])
 
   const isAnswered = selectedKeys.length > 0
-  const dynamicPose = isAnswered
-    ? question.stage === 'CONNECT'
-      ? 'wink'
-      : 'happy'
-    : question.mascot_pose || (question.stage === 'THINK' ? 'thinking' : 'pointing')
+  const stageIdlePool = IDLE_POSES_BY_STAGE[question.stage] || ['pointing']
+  const baseIdlePose = stageIdlePool[questionIndex % stageIdlePool.length]
+  const answeredPose = ANSWERED_POSES[questionIndex % ANSWERED_POSES.length]
+
+  const dynamicPose: DivaPose = justChanged
+    ? 'surprised'
+    : isAnswered
+      ? answeredPose
+      : isIdleLong
+        ? questionIndex % 2 === 0
+          ? 'sleepy'
+          : 'confused'
+        : baseIdlePose
+
+  const divaReactionCaption = justChanged
+    ? 'Ồ, cân nhắc lại kỹ ghê!'
+    : isAnswered
+      ? 'Tuyệt vời! Sẵn sàng đi tiếp chưa?'
+      : isIdleLong
+        ? 'Bí rồi à? Cứ đọc kỹ từ khóa nhé!'
+        : STAGE_MOOD_TIP[question.stage]
 
   const handleSingleClick = (key: string) => {
     onSelect([key])
@@ -71,7 +123,7 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
                 className={cn(
                   'mx-1 inline-flex min-w-[92px] items-center justify-center rounded-xl border-2 px-3 py-0.5 text-sm sm:text-base font-bold transition-all',
                   opt
-                    ? 'border-diva-ink bg-diva-yellow text-diva-ink shadow-comic-sm'
+                    ? 'border-diva-ink bg-diva-yellow text-diva-ink shadow-comic-sm animate-option-pop'
                     : 'border-dashed border-diva-ink/50 bg-white/80 text-muted-foreground'
                 )}
                 title={opt ? 'Nhấn để bỏ chọn' : 'Chưa điền'}
@@ -87,26 +139,27 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
   }
 
   return (
-    <div className="space-y-4">
+    <div key={question.question_code} className="space-y-4 animate-question-enter">
       {/* Mascot + Speech Bubble Prompt */}
       <div className="flex flex-col sm:flex-row items-center sm:items-start gap-3 sm:gap-4">
         <div className="shrink-0 flex flex-col items-center">
           <DivaMascot pose={dynamicPose} size="md" />
-          <Badge variant="outline" className="mt-1 bg-white/90 border-diva-ink/30 text-[11px]">
+          <Badge variant="outline" className="mt-1 bg-white/95 border-diva-ink/40 text-[11px] font-bold">
             {question.concept}
           </Badge>
         </div>
 
         <div className="relative flex-1 w-full rounded-2xl border-2 border-diva-ink bg-white p-4 sm:p-5 shadow-comic-sm">
-          <div className="mb-1.5 flex items-center justify-between gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-diva-red">
+          <div className="mb-1.5 flex flex-wrap items-center justify-between gap-2">
+            <span className="text-xs font-extrabold uppercase tracking-wider text-diva-red">
               Mã câu: {question.question_code}
             </span>
-            {question.question_type === 'MULTI_FILL_BLANK' && (
-              <span className="text-xs font-medium text-muted-foreground">
-                Chọn {blankCount} từ bên dưới để điền
-              </span>
-            )}
+            <span className="inline-flex items-center gap-1 rounded-full bg-diva-parchment px-2.5 py-0.5 text-[11px] font-semibold text-diva-ink border border-diva-ink/20">
+              <Sparkles className="h-3 w-3 text-diva-orange" />
+              {question.question_type === 'MULTI_FILL_BLANK'
+                ? `Chọn ${blankCount} từ bên dưới để điền`
+                : divaReactionCaption}
+            </span>
           </div>
 
           {question.question_type === 'MULTI_FILL_BLANK' ? (
@@ -211,15 +264,15 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
                 type="button"
                 onClick={() => handleChipClick(opt.key)}
                 className={cn(
-                  'flex items-center gap-2.5 rounded-2xl border-2 border-diva-ink px-3 py-3 text-left transition-all active:translate-y-[1px]',
+                  'flex items-center gap-2.5 rounded-2xl border-2 border-diva-ink px-3 py-3 text-left transition-all duration-150 hover:translate-y-[-2px] active:translate-y-[1px]',
                   active
-                    ? 'bg-diva-yellow shadow-comic-sm'
+                    ? 'bg-diva-yellow shadow-comic-sm animate-option-pop'
                     : 'bg-white hover:bg-diva-parchmentDark/60 shadow-comic'
                 )}
               >
                 <span
                   className={cn(
-                    'flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 border-diva-ink text-xs font-extrabold',
+                    'flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 border-diva-ink text-xs font-extrabold transition-colors',
                     active ? 'bg-diva-red text-white' : 'bg-diva-orange text-white'
                   )}
                 >
@@ -241,9 +294,9 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
                 type="button"
                 onClick={() => handleSingleClick(opt.key)}
                 className={cn(
-                  'group relative flex flex-col items-center rounded-2xl border-2 border-diva-ink p-3 transition-all',
+                  'group relative flex flex-col items-center rounded-2xl border-2 border-diva-ink p-3 transition-all duration-150 hover:translate-y-[-2px]',
                   active
-                    ? 'bg-diva-yellow shadow-comic ring-2 ring-diva-orange'
+                    ? 'bg-diva-yellow shadow-comic ring-2 ring-diva-orange animate-option-pop'
                     : 'bg-white hover:bg-diva-parchmentDark/50 shadow-comic'
                 )}
               >
@@ -283,16 +336,16 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
                 type="button"
                 onClick={() => handleSingleClick(opt.key)}
                 className={cn(
-                  'flex w-full items-center gap-3 rounded-2xl border-2 border-diva-ink px-4 py-3.5 text-left transition-all min-h-[54px]',
+                  'flex w-full items-center gap-3 rounded-2xl border-2 border-diva-ink px-4 py-3.5 text-left transition-all duration-150 min-h-[56px] hover:translate-y-[-2px] active:translate-y-[1px]',
                   active
-                    ? 'bg-diva-yellow shadow-comic translate-y-[-1px]'
+                    ? 'bg-diva-yellow shadow-comic animate-option-pop'
                     : 'bg-white hover:bg-diva-parchmentDark/60 shadow-comic-sm'
                 )}
               >
                 <span
                   className={cn(
-                    'flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 border-diva-ink text-sm font-extrabold',
-                    active ? 'bg-diva-red text-white' : 'bg-diva-orange text-white'
+                    'flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 border-diva-ink text-sm font-extrabold transition-transform',
+                    active ? 'bg-diva-red text-white scale-110' : 'bg-diva-orange text-white'
                   )}
                 >
                   {opt.key}
@@ -300,7 +353,7 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
                 <span className="flex-1 text-sm sm:text-base font-semibold text-diva-ink">
                   {opt.text}
                 </span>
-                {active && <CheckCircle2 className="h-5 w-5 shrink-0 text-diva-red" />}
+                {active && <CheckCircle2 className="h-5 w-5 shrink-0 text-diva-red animate-diva-pop" />}
               </button>
             )
           })}

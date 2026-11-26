@@ -36,7 +36,7 @@
   }
 }
 
-/* Custom DiVA Comic & Parchment Helpers */
+/* Custom DiVA Comic & Parchment Backgrounds */
 .diva-sunburst {
   background: repeating-conic-gradient(
     from 0deg at 50% 45%,
@@ -47,10 +47,150 @@
 
 .diva-parchment {
   background-color: #fdf6e3;
-  background-image: radial-gradient(rgba(180, 145, 95, 0.08) 1px, transparent 0);
+  background-image: radial-gradient(rgba(180, 145, 95, 0.1) 1px, transparent 0);
   background-size: 16px 16px;
 }
 
 .diva-sky-bg {
   background: linear-gradient(180deg, #cfdad4 0%, #e4ebe7 55%, #f3ebd8 100%);
+}
+
+/* ==================== DiVA Dynamic Animations ==================== */
+@keyframes divaFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-7px) rotate(1.2deg);
+  }
+}
+
+@keyframes divaPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.76) translateY(10px) rotate(-5deg);
+  }
+  65% {
+    opacity: 1;
+    transform: scale(1.07) translateY(-4px) rotate(2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0px) rotate(0deg);
+  }
+}
+
+@keyframes divaCheer {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  30% {
+    transform: translateY(-12px) scale(1.05) rotate(-3deg);
+  }
+  60% {
+    transform: translateY(-4px) scale(1.02) rotate(3deg);
+  }
+}
+
+@keyframes divaRun {
+  0%, 100% {
+    transform: translateX(0px) translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateX(4px) translateY(-6px) rotate(2deg);
+  }
+  75% {
+    transform: translateX(-2px) translateY(-3px) rotate(-1deg);
+  }
+}
+
+@keyframes questionEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0px) scale(1);
+  }
+}
+
+@keyframes optionPop {
+  0% {
+    transform: scale(0.97);
+  }
+  50% {
+    transform: scale(1.025);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes confettiFloat {
+  0% {
+    opacity: 0;
+    transform: translateY(16px) scale(0.6) rotate(0deg);
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-42px) scale(1.1) rotate(160deg);
+  }
+}
+
+@keyframes shineSweep {
+  0% {
+    transform: translateX(-140%) skewX(-20deg);
+  }
+  100% {
+    transform: translateX(240%) skewX(-20deg);
+  }
+}
+
+.animate-diva-float {
+  animation: divaFloat 3.2s ease-in-out infinite;
+}
+
+.animate-diva-pop {
+  animation: divaPop 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-diva-cheer {
+  animation: divaCheer 1.3s ease-in-out infinite;
+}
+
+.animate-diva-run {
+  animation: divaRun 0.9s ease-in-out infinite;
+}
+
+.animate-question-enter {
+  animation: questionEnter 0.36s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-option-pop {
+  animation: optionPop 0.25s ease-out both;
+}
+
+.animate-confetti {
+  animation: confettiFloat 2.4s ease-out infinite;
+}
+
+.btn-comic-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-comic-shine::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  animation: shineSweep 3.2s ease-in-out infinite;
+  pointer-events: none;
 }

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, CheckCircle2, Clock, Compass, Play, Sparkles, UserCheck } from 'lucide-react'
-import { DivaMascot } from '@/components/diva/DivaMascot'
+import { DivaMascot, type DivaPose } from '@/components/diva/DivaMascot'
 import { QuestionRenderer } from '@/components/quiz/QuestionRenderer'
 import { ResultReview } from '@/components/quiz/ResultReview'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -18,7 +18,7 @@ type ScreenMode = 'welcome' | 'stage_intro' | 'playing' | 'result'
 
 const STAGE_META: Record<
   Stage,
-  { title: string; subtitle: string; badge: string; pose: 'explore' | 'thinking' | 'pointing' }
+  { title: string; subtitle: string; badge: string; pose: DivaPose }
 > = {
   LOOK: {
     title: 'Chặng 1: LOOK',
@@ -36,7 +36,7 @@ const STAGE_META: Record<
     title: 'Chặng 3: CONNECT',
     subtitle: 'Liên hệ các tình huống thực tế ngay trong công việc hằng ngày',
     badge: 'bg-diva-green text-diva-ink',
-    pose: 'pointing',
+    pose: 'running',
   },
 }
 
@@ -57,6 +57,7 @@ export const QuizPage: React.FC = () => {
   const [questions, setQuestions] = useState<SafeQuestion[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers, setAnswers] = useState<Record<string, string[]>>({})
+  const [changeCounts, setChangeCounts] = useState<Record<string, number>>({})
   const [elapsedSec, setElapsedSec] = useState(0)
   const [submitting, setSubmitting] = useState(false)
   const [submitResult, setSubmitResult] = useState<SubmitQuizResponse | null>(null)
@@ -65,7 +66,6 @@ export const QuizPage: React.FC = () => {
   const questionShownAtRef = useRef<number>(Date.now())
   const blurStartRef = useRef<number | null>(null)
 
-  // Auto-prefill if user came from /secret-login as an employee
   useEffect(() => {
     const sess = getActiveSession()
     if (sess && sess.user.employee_code) {
@@ -73,7 +73,6 @@ export const QuizPage: React.FC = () => {
     }
   }, [])
 
-  // Timer & TAB_BLUR / TAB_FOCUS telemetry during active quiz
   useEffect(() => {
     if (screen !== 'playing' && screen !== 'stage_intro') return
     const timer = window.setInterval(() => {
@@ -147,8 +146,8 @@ export const QuizPage: React.FC = () => {
       setAttemptToken(started.attemptToken)
       setQuestions(started.questions)
       setAnswers(started.draftAnswers || {})
+      setChangeCounts({})
 
-      // Resume to first unanswered question if resumed
       let startIdx = 0
       if (started.resumed && started.questions.length > 0) {
         const firstUnanswered = started.questions.findIndex(
@@ -215,6 +214,10 @@ export const QuizPage: React.FC = () => {
           payload: { from: prev, to: keys },
           timeSpentMs: timeFromView,
         })
+        setChangeCounts((c) => ({
+          ...c,
+          [currentQuestion.question_code]: (c[currentQuestion.question_code] || 0) + 1,
+        }))
       }
     }
     setAnswers((curr) => ({ ...curr, [currentQuestion.question_code]: keys }))
@@ -255,7 +258,6 @@ export const QuizPage: React.FC = () => {
       return
     }
 
-    // Final Submit
     setSubmitting(true)
     try {
       trackerRef.current.record('QUIZ_SUBMIT', 'RESULT', {
@@ -288,9 +290,10 @@ export const QuizPage: React.FC = () => {
 
   // ==================== SCREEN 1: WELCOME ====================
   if (screen === 'welcome') {
+    const welcomePose: DivaPose = authError ? 'worried' : verifiedUser ? 'excited' : 'hero_presenting'
     return (
       <div className="min-h-screen diva-sunburst flex flex-col justify-between p-4 sm:p-6">
-        <div className="mx-auto w-full max-w-2xl my-auto">
+        <div className="mx-auto w-full max-w-2xl my-auto animate-question-enter">
           <Card className="overflow-hidden border-4 border-diva-ink bg-diva-parchment shadow-comic">
             {/* Top Ribbon Header */}
             <div className="bg-diva-red px-4 py-3 text-center border-b-4 border-diva-ink">
@@ -306,11 +309,13 @@ export const QuizPage: React.FC = () => {
 
             <CardContent className="p-5 sm:p-7 space-y-5">
               <div className="flex flex-col sm:flex-row items-center gap-4">
-                <DivaMascot pose="presenting" size="lg" className="shrink-0" />
+                <DivaMascot pose={welcomePose} size="xl" className="shrink-0" />
                 <div className="space-y-2.5 text-center sm:text-left">
                   <div className="rounded-2xl border-2 border-diva-ink bg-white p-3.5 shadow-comic-sm">
                     <p className="font-semibold text-diva-ink text-sm sm:text-base">
-                      “Cùng Tắc kè DiVA khám phá <span className="text-diva-red font-bold">Tầm nhìn MMV 2035</span> qua hành trình giải đố 3 chặng thú vị nhé!”
+                      {verifiedUser
+                        ? `Chào ${verifiedUser.full_name}! DiVA đã sẵn sàng đồng hành cùng bạn chinh phục 15 thử thách Vision 2035!`
+                        : '“Cùng Tắc kè DiVA khám phá Tầm nhìn MMV 2035 qua hành trình giải đố 3 chặng thú vị nhé!”'}
                     </p>
                   </div>
                   <div className="flex flex-wrap justify-center sm:justify-start gap-2 text-xs">
@@ -345,7 +350,7 @@ export const QuizPage: React.FC = () => {
                         size="lg"
                         disabled={verifying}
                         onClick={() => handleVerifyEmployee()}
-                        className="h-12 shrink-0"
+                        className="h-12 shrink-0 btn-comic-shine"
                       >
                         <UserCheck className="mr-1.5 h-4 w-4" />
                         {verifying ? 'Đang kiểm tra...' : 'Xác nhận'}
@@ -364,7 +369,7 @@ export const QuizPage: React.FC = () => {
                             setEmployeeCode(code)
                             handleVerifyEmployee(code)
                           }}
-                          className="rounded-lg border bg-diva-parchment px-2 py-0.5 font-semibold text-diva-ink hover:bg-diva-yellow/60"
+                          className="rounded-lg border bg-diva-parchment px-2 py-0.5 font-semibold text-diva-ink hover:bg-diva-yellow/60 transition-colors"
                         >
                           {code}
                         </button>
@@ -373,7 +378,7 @@ export const QuizPage: React.FC = () => {
                   )}
                 </div>
               ) : (
-                <div className="rounded-2xl border-2 border-diva-ink bg-white p-4 sm:p-5 space-y-4">
+                <div className="rounded-2xl border-2 border-diva-ink bg-white p-4 sm:p-5 space-y-4 animate-question-enter">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
                       <p className="text-xs font-bold uppercase text-emerald-700 flex items-center gap-1">
@@ -416,7 +421,7 @@ export const QuizPage: React.FC = () => {
                   <Button
                     variant="comic"
                     size="xl"
-                    className="w-full text-lg"
+                    className="w-full text-lg btn-comic-shine"
                     disabled={verifying}
                     onClick={handleStartQuiz}
                   >
@@ -435,7 +440,6 @@ export const QuizPage: React.FC = () => {
           </Card>
         </div>
 
-        {/* Discreet footer with secret gate entry for testing/admin */}
         <footer className="mt-6 text-center text-xs text-white/75 flex items-center justify-center gap-3">
           <span>MMV Vision 2035 — DiVA Explorer</span>
           <span>•</span>
@@ -452,16 +456,16 @@ export const QuizPage: React.FC = () => {
     const meta = STAGE_META[currentQuestion.stage]
     return (
       <div className="min-h-screen diva-sky-bg flex items-center justify-center p-4">
-        <Card className="w-full max-w-lg border-4 border-diva-ink bg-diva-parchment shadow-comic text-center">
+        <Card className="w-full max-w-lg border-4 border-diva-ink bg-diva-parchment shadow-comic text-center animate-question-enter">
           <CardContent className="p-6 sm:p-8 space-y-5">
             <div className={`inline-block rounded-full border-2 border-diva-ink px-5 py-1.5 font-display text-lg font-extrabold shadow-comic-sm ${meta.badge}`}>
               {meta.title}
             </div>
             <div className="flex justify-center">
-              <DivaMascot pose={meta.pose} size="lg" />
+              <DivaMascot pose={meta.pose} size="xl" />
             </div>
             <p className="text-base sm:text-lg font-semibold text-diva-ink">{meta.subtitle}</p>
-            <Button variant="comic" size="xl" className="w-full" onClick={enterPlayingCurrentQuestion}>
+            <Button variant="comic" size="xl" className="w-full btn-comic-shine" onClick={enterPlayingCurrentQuestion}>
               <Compass className="mr-2 h-5 w-5" /> Bắt đầu {meta.title}
             </Button>
           </CardContent>
@@ -513,16 +517,15 @@ export const QuizPage: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Stage Progress Dots */}
             <div className="hidden sm:flex items-center gap-1.5">
               {Array.from({ length: stageQuestionsInfo.stageTotal }).map((_, i) => (
                 <span
                   key={i}
-                  className={`h-3 w-3 rounded-full border border-diva-ink ${
+                  className={`h-3 w-3 rounded-full border border-diva-ink transition-all duration-300 ${
                     i + 1 < stageQuestionsInfo.posInStage
-                      ? 'bg-diva-green'
+                      ? 'bg-diva-green scale-100'
                       : i + 1 === stageQuestionsInfo.posInStage
-                        ? 'bg-diva-yellow scale-125'
+                        ? 'bg-diva-yellow scale-125 ring-2 ring-diva-orange/50'
                         : 'bg-white'
                   }`}
                 />
@@ -540,7 +543,9 @@ export const QuizPage: React.FC = () => {
           <CardContent className="p-4 sm:p-6">
             <QuestionRenderer
               question={currentQuestion}
+              questionIndex={currentIndex}
               selectedKeys={currentSelected}
+              changeCount={changeCounts[currentQuestion.question_code] || 0}
               onSelect={handleSelectAnswer}
             />
           </CardContent>
@@ -563,7 +568,7 @@ export const QuizPage: React.FC = () => {
             size="lg"
             disabled={!canProceed || submitting}
             onClick={handleNextOrSubmit}
-            className="min-w-[170px]"
+            className="min-w-[180px] btn-comic-shine"
           >
             {submitting
               ? 'Đang chấm điểm...'
