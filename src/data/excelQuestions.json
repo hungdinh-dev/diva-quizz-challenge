@@ -1,0 +1,992 @@
+﻿[
+    {
+        "question_code":  "A01",
+        "source_set":  "Bo_A",
+        "stage":  "LOOK",
+        "concept":  "Nhận diện hình",
+        "question_type":  "IMAGE_CHOICE",
+        "prompt_text":  "Linh vật nào đại diện cho tinh thần linh hoạt và đổi mới của MMV?",
+        "options_json":  [
+                             {
+                                 "key":  "A",
+                                 "text":  "Tắc kè hoa"
+                             },
+                             {
+                                 "key":  "B",
+                                 "text":  "Rồng"
+                             },
+                             {
+                                 "key":  "C",
+                                 "text":  "Chim én"
+                             }
+                         ],
+        "correct_answer_json":  {
+                                    "keys":  [
+                                                 "A"
+                                             ]
+                                },
+        "explanation":  "Tắc kè hoa tượng trưng cho sự chuyển đổi, linh hoạt và khả năng thích ứng của MMV.",
+        "reviewer_note":  "Mascot gốc",
+        "shuffle_options":  true,
+        "mascot_pose":  "pointing",
+        "review_status":  "Da_duyet",
+        "needs_verification":  false
+    },
+    {
+        "question_code":  "A02",
+        "source_set":  "Bo_A",
+        "stage":  "LOOK",
+        "concept":  "Điền khuyết",
+        "question_type":  "SINGLE_CHOICE",
+        "prompt_text":  "Hoàn thành thông điệp: “Linh hoạt để đổi mới – …”",
+        "options_json":  [
+                             {
+                                 "key":  "A",
+                                 "text":  "Kiên trì với niềm vui"
+                             },
+                             {
+                                 "key":  "B",
+                                 "text":  "Phát triển cùng công nghệ"
+                             },
+                             {
+                                 "key":  "C",
+                                 "text":  "Vượt qua mọi đối thủ"
+                             }
+                         ],
+        "correct_answer_json":  {
+                                    "keys":  [
+                                                 "A"
+                                             ]
+                                },
+        "explanation":  "Đây là câu đầu trong thông điệp Vision 2035.",
+        "reviewer_note":  "Che cụm từ trên poster",
+        "shuffle_options":  true,
+        "mascot_pose":  "pointing",
+        "review_status":  "Da_duyet",
+        "needs_verification":  false
+    },
+    {
+        "question_code":  "A03",
+        "source_set":  "Bo_A",
+        "stage":  "LOOK",
+        "concept":  "Nhận diện hình",
+        "question_type":  "IMAGE_CHOICE",
+        "prompt_text":  "Trong ba hình biểu tượng DX, FX và GX, hình nào đại diện cho chuyển đổi kỹ thuật số?",
+        "options_json":  [
+                             {
+                                 "key":  "A",
+                                 "text":  "Hình DX"
+                             },
+                             {
+                                 "key":  "B",
+                                 "text":  "Hình FX"
+                             },
+                             {
+                                 "key":  "C",
+                                 "text":  "Hình GX"
+                             }
+                         ],
+        "correct_answer_json":  {
+                                    "keys":  [
+                                                 "A"
+                                             ]
+                                },
+        "explanation":  "DX là chuyển đổi kỹ thuật số, gắn với công nghệ và dữ liệu.",
+        "reviewer_note":  "Cắt hình DX, FX, GX gốc",
+        "shuffle_options":  true,
+        "mascot_pose":  "pointing",
+        "review_status":  "Da_duyet",
+        "needs_verification":  false
+    },
+    {
+        "question_code":  "A04",
+        "source_set":  "Bo_A",
+        "stage":  "LOOK",
+        "concept":  "Nhận diện hình",
+        "question_type":  "IMAGE_CHOICE",
+        "prompt_text":  "Biểu tượng bắt tay trong 3C with I thể hiện giá trị nào?",
+        "options_json":  [
+                             {
+                                 "key":  "A",
+                                 "text":  "Hợp tác"
+                             },
+                             {
+                                 "key":  "B",
+                                 "text":  "Cam kết"
+                             },
+                             {
+                                 "key":  "C",
+                                 "text":  "Chính trực"
+                             }
+                         ],
+        "correct_answer_json":  {
+                                    "keys":  [
+                                                 "A"
+                                             ]
+                                },
+        "explanation":  "Collaboration – Hợp tác nhấn mạnh tôn trọng khác biệt và cùng kiến tạo giá trị.",
+        "reviewer_note":  "Xác nhận icon trên poster",
+        "shuffle_options":  true,
+        "mascot_pose":  "pointing",
+        "review_status":  "Da_duyet",
+        "needs_verification":  false
+    },
+    {
+        "question_code":  "A05",
+        "source_set":  "Bo_A",
+        "stage":  "LOOK",
+        "concept":  "Tìm điểm khác biệt",
+        "question_type":  "SPOT_DIFFERENCE",
+        "prompt_text":  "Quan sát hai hình Vision. Hình nào có đầy đủ bốn giá trị 3C with I?",
+        "options_json":  [
+                             {
+                                 "key":  "A",
+                                 "text":  "Hình A"
+                             },
+                             {
+                                 "key":  "B",
+                                 "text":  "Hình B"
+                             },
+                             {
+                                 "key":  "C",
+                                 "text":  "Cả hai"
+                             }
+                         ],
+        "correct_answer_json":  {
+                                    "keys":  [
+                                                 "A"
+                                             ]
+                                },
+        "explanation":  "3C with I gồm Challenge, Collaboration, Commitment và Integrity.",
+        "reviewer_note":  "Cần dựng hình B thiếu một giá trị; khóa đáp án sau kiểm tra",
+        "shuffle_options":  false,
+        "mascot_pose":  "pointing",
+        "review_status":  "Can_chinh_sua",
+        "needs_verification":  true
+    },
+    {
+        "question_code":  "A06",
+        "source_set":  "Bo_A",
+        "stage":  "THINK",
+        "concept":  "Company of Choice",
+        "question_type":  "SINGLE_CHOICE",
+        "prompt_text":  "Theo Vision 2035, MMV mong muốn trở thành công ty được những ai tin tưởng lựa chọn?",
+        "options_json":  [
+                             {
+                                 "key":  "A",
+                                 "text":  "Chỉ khách hàng"
+                             },
+                             {
+                                 "key":  "B",
+                                 "text":  "Khách hàng, nhân viên và xã hội"
+                             },
+                             {
+                                 "key":  "C",
+                                 "text":  "Chỉ nhân viên và đối tác"
+                             }
+                         ],
+        "correct_answer_json":  {
+                                    "keys":  [
+                                                 "B"
+                                             ]
+                                },
+        "explanation":  "Sự tin chọn cho tương lai hướng đến khách hàng, nhân viên và xã hội.",
+        "reviewer_note":  "",
+        "shuffle_options":  true,
+        "mascot_pose":  "thinking",
+        "review_status":  "Da_duyet",
+        "needs_verification":  false
+    },
+    {
+        "question_code":  "A07",
+        "source_set":  "Bo_A",
+        "stage":  "THINK",
+        "concept":  "Think Twice",
+        "question_type":  "SINGLE_CHOICE",
+        "prompt_text":  "Một công ty có sản phẩm chất lượng tốt đã đủ để trở thành “Sự tin chọn cho tương lai” chưa?",
+        "options_json":  [
+                             {
+                                 "key":  "A",
+                                 "text":  "Đủ, vì chất lượng là yếu tố quan trọng nhất."
+                             },
+                             {
+                                 "key":  "B",
+                                 "text":  "Chưa đủ, vì MMV còn cần tạo giá trị cho nhân viên và xã hội."
+                             },
+                             {
+                                 "key":  "C",
+                                 "text":  "Đủ, nếu khách hàng tiếp tục đặt hàng."
+                             }
+                         ],
+        "correct_answer_json":  {
+                                    "keys":  [
+                                                 "B"
+                                             ]
+                                },
+        "explanation":  "Chất lượng quan trọng, nhưng Vision còn hướng đến nhân viên hạnh phúc và đóng góp xã hội.",
+        "reviewer_note":  "",
+        "shuffle_options":  true,
+        "mascot_pose":  "thinking",
+        "review_status":  "Da_duyet",
+        "needs_verification":  false
+    },
+    {
+        "question_code":  "A08",
+        "source_set":  "Bo_A",
+        "stage":  "THINK",
+        "concept":  "Find Connection",
+        "question_type":  "SINGLE_CHOICE",
+        "prompt_text":  "Điểm chung quan trọng nhất giữa Agility và Gritty Joy là gì?",
+        "options_json":  [
+                             {
+                                 "key":  "A",
+                                 "text":  "Luôn thay đổi thật nhanh trong mọi tình huống."
+                             },
+                             {
+                                 "key":  "B",
+                                 "text":  "Chỉ tập trung đạt kết quả cuối cùng."
+                             },
+                             {
+                                 "key":  "C",
+                                 "text":  "Linh hoạt trước thay đổi và kiên trì vượt khó với tinh thần tích cực."
+                             }
+                         ],
+        "correct_answer_json":  {
+                                    "keys":  [
+                                                 "C"
+                                             ]
+                                },
+        "explanation":  "Agility là thích ứng, đổi mới; Gritty Joy là bền bỉ và niềm vui.",
+        "reviewer_note":  "",
+        "shuffle_options":  true,
+        "mascot_pose":  "thinking",
+        "review_status":  "Da_duyet",
+        "needs_verification":  false
+    },
+    {
+        "question_code":  "A09",
+        "source_set":  "Bo_A",
+        "stage":  "THINK",
+        "concept":  "Which Does Not Fit",
+        "question_type":  "SINGLE_CHOICE",
+        "prompt_text":  "Nhận định nào CHƯA phù hợp với tinh thần Localization trong DiVA?",
+        "options_json":  [
+                             {
+                                 "key":  "A",
+                                 "text":  "Nhân viên Việt Nam chủ động suy nghĩ và đề xuất."
+                             },
+                             {
+                                 "key":  "B",
+                                 "text":  "Nhân viên Việt Nam phải tự làm mọi việc, không cần hỗ trợ từ Nhật."
+                             },
+                             {
+                                 "key":  "C",
+                                 "text":  "Nhân viên Việt Nam từng bước nâng cao năng lực tự chủ."
+                             }
+                         ],
+        "correct_answer_json":  {
+                                    "keys":  [
+                                                 "B"
+                                             ]
+                                },
+        "explanation":  "DiVA = Discover Vietnam Autonomously – Khám phá nội lực Việt, dẫn dắt hành trình đổi mới. Đây là lần đầu Vision được đội ngũ địa phương chủ động suy nghĩ, thảo luận và xây dựng, với sự hỗ trợ của đồng nghiệp Nhật.",
+        "reviewer_note":  "",
+        "shuffle_options":  true,
+        "mascot_pose":  "thinking",
+        "review_status":  "Da_duyet",
+        "needs_verification":  false
+    },
+    {
+        "question_code":  "A10",
+        "source_set":  "Bo_A",
+        "stage":  "THINK",
+        "concept":  "Find Connection",
+        "question_type":  "SINGLE_CHOICE",
+        "prompt_text":  "CX có vai trò như thế nào đối với BX, DX, FX và GX?",
+        "options_json":  [
+                             {
+                                 "key":  "A",
+                                 "text":  "Thay thế nhiệm vụ của các trục còn lại."
+                             },
+                             {
+                                 "key":  "B",
+                                 "text":  "Chỉ truyền đạt kết quả sau khi các trục hoàn thành."
+                             },
+                             {
+                                 "key":  "C",
+                                 "text":  "Kết nối con người, xây dựng niềm tin và thúc đẩy hợp tác giữa các trục."
+                             }
+                         ],
+        "correct_answer_json":  {
+                                    "keys":  [
+                                                 "C"
+                                             ]
+                                },
+        "explanation":  "CX hỗ trợ kết nối và hợp tác để các trục cùng tiến về Vision.",
+        "reviewer_note":  "",
+        "shuffle_options":  true,
+        "mascot_pose":  "thinking",
+        "review_status":  "Da_duyet",
+        "needs_verification":  false
+    },
+    {
+        "question_code":  "A11",
+        "source_set":  "Bo_A",
+        "stage":  "THINK",
+        "concept":  "Which Does Not Fit",
+        "question_type":  "SINGLE_CHOICE",
+        "prompt_text":  "Nhận định nào CHƯA phản ánh đúng tinh thần Collaboration?",
+        "options_json":  [
+                             {
+                                 "key":  "A",
+                                 "text":  "Tôn trọng sự khác biệt."
+                             },
+                             {
+                                 "key":  "B",
+                                 "text":  "Mọi người phải luôn có cùng ý kiến."
+                             },
+                             {
+                                 "key":  "C",
+                                 "text":  "Hỗ trợ lẫn nhau và hướng đến mục tiêu chung."
+                             }
+                         ],
+        "correct_answer_json":  {
+                                    "keys":  [
+                                                 "B"
+                                             ]
+                                },
+        "explanation":  "Collaboration đề cao tôn trọng khác biệt và hợp tác, không đòi hỏi cùng ý kiến.",
+        "reviewer_note":  "",
+        "shuffle_options":  true,
+        "mascot_pose":  "thinking",
+        "review_status":  "Da_duyet",
+        "needs_verification":  false
+    },
+    {
+        "question_code":  "A12",
+        "source_set":  "Bo_A",
+        "stage":  "CONNECT",
+        "concept":  "Tình huống GX",
+        "question_type":  "SINGLE_CHOICE",
+        "prompt_text":  "Bạn phát hiện dấu hiệu bất thường có thể ảnh hưởng đến chất lượng sản phẩm. Bạn sẽ làm gì?",
+        "options_json":  [
+                             {
+                                 "key":  "A",
+                                 "text":  "Bỏ qua vì chưa xảy ra lỗi."
+                             },
+                             {
+                                 "key":  "B",
+                                 "text":  "Chủ động báo cáo, phối hợp tìm nguyên nhân và phòng ngừa."
+                             },
+                             {
+                                 "key":  "C",
+                                 "text":  "Chờ đến khi có lỗi thực tế."
+                             }
+                         ],
+        "correct_answer_json":  {
+                                    "keys":  [
+                                                 "B"
+                                             ]
+                                },
+        "explanation":  "GX nhấn mạnh phát hiện sớm, quản lý từ nguồn và phòng ngừa.",
+        "reviewer_note":  "",
+        "shuffle_options":  true,
+        "mascot_pose":  "wink",
+        "review_status":  "Da_duyet",
+        "needs_verification":  false
+    },
+    {
+        "question_code":  "A13",
+        "source_set":  "Bo_A",
+        "stage":  "CONNECT",
+        "concept":  "Tình huống Commitment",
+        "question_type":  "SINGLE_CHOICE",
+        "prompt_text":  "Một vấn đề phát sinh liên quan đến nhiều bộ phận. Hành động nào thể hiện Commitment?",
+        "options_json":  [
+                             {
+                                 "key":  "A",
+                                 "text":  "Cho rằng không phải trách nhiệm của mình."
+                             },
+                             {
+                                 "key":  "B",
+                                 "text":  "Chờ bộ phận khác xử lý."
+                             },
+                             {
+                                 "key":  "C",
+                                 "text":  "Chủ động phối hợp và theo dõi giải quyết đến cùng."
+                             }
+                         ],
+        "correct_answer_json":  {
+                                    "keys":  [
+                                                 "C"
+                                             ]
+                                },
+        "explanation":  "Cam kết là không đổ lỗi, chủ động nhận trách nhiệm và giải quyết đến cùng.",
+        "reviewer_note":  "",
+        "shuffle_options":  true,
+        "mascot_pose":  "wink",
+        "review_status":  "Da_duyet",
+        "needs_verification":  false
+    },
+    {
+        "question_code":  "A14",
+        "source_set":  "Bo_A",
+        "stage":  "CONNECT",
+        "concept":  "Tình huống Gritty Joy",
+        "question_type":  "SINGLE_CHOICE",
+        "prompt_text":  "Nhóm gặp khó khăn trong quá trình cải tiến và chưa đạt kết quả mong muốn. Hành động nào thể hiện Gritty Joy?",
+        "options_json":  [
+                             {
+                                 "key":  "A",
+                                 "text":  "Dừng lại vì chưa thấy kết quả."
+                             },
+                             {
+                                 "key":  "B",
+                                 "text":  "Tiếp tục cùng nhau tìm giải pháp với tinh thần tích cực."
+                             },
+                             {
+                                 "key":  "C",
+                                 "text":  "Chỉ chờ quản lý quyết định bước tiếp theo."
+                             }
+                         ],
+        "correct_answer_json":  {
+                                    "keys":  [
+                                                 "B"
+                                             ]
+                                },
+        "explanation":  "Gritty Joy là không bỏ cuộc, bền bỉ tiến bước với niềm vui.",
+        "reviewer_note":  "",
+        "shuffle_options":  true,
+        "mascot_pose":  "wink",
+        "review_status":  "Da_duyet",
+        "needs_verification":  false
+    },
+    {
+        "question_code":  "A15",
+        "source_set":  "Bo_A",
+        "stage":  "CONNECT",
+        "concept":  "Final Challenge",
+        "question_type":  "SINGLE_CHOICE",
+        "prompt_text":  "Hành động nào góp phần đưa MMV trở thành “Sự tin chọn cho tương lai”?",
+        "options_json":  [
+                             {
+                                 "key":  "A",
+                                 "text":  "Chỉ quan tâm đến kết quả của bộ phận mình."
+                             },
+                             {
+                                 "key":  "B",
+                                 "text":  "Giữ chất lượng, hợp tác, cải tiến và cùng tạo môi trường làm việc tốt."
+                             },
+                             {
+                                 "key":  "C",
+                                 "text":  "Chỉ thực hiện khi có yêu cầu từ cấp trên."
+                             }
+                         ],
+        "correct_answer_json":  {
+                                    "keys":  [
+                                                 "B"
+                                             ]
+                                },
+        "explanation":  "Vision được hiện thực hóa qua hành động tạo niềm tin và giá trị cho khách hàng, nhân viên, xã hội.",
+        "reviewer_note":  "",
+        "shuffle_options":  true,
+        "mascot_pose":  "wink",
+        "review_status":  "Da_duyet",
+        "needs_verification":  false
+    },
+    {
+        "question_code":  "B01",
+        "source_set":  "Bo_B",
+        "stage":  "LOOK",
+        "concept":  "Điền khuyết",
+        "question_type":  "SINGLE_CHOICE",
+        "prompt_text":  "Hoàn thành thông điệp: “MMV, sự tin chọn cho …”",
+        "options_json":  [
+                             {
+                                 "key":  "A",
+                                 "text":  "Hôm nay"
+                             },
+                             {
+                                 "key":  "B",
+                                 "text":  "Tương lai"
+                             },
+                             {
+                                 "key":  "C",
+                                 "text":  "Khách hàng"
+                             }
+                         ],
+        "correct_answer_json":  {
+                                    "keys":  [
+                                                 "B"
+                                             ]
+                                },
+        "explanation":  "“MMV, sự tin chọn cho tương lai” là khát vọng Vision 2035.",
+        "reviewer_note":  "Poster Vision",
+        "shuffle_options":  true,
+        "mascot_pose":  "pointing",
+        "review_status":  "Da_duyet",
+        "needs_verification":  false
+    },
+    {
+        "question_code":  "B02",
+        "source_set":  "Bo_B",
+        "stage":  "LOOK",
+        "concept":  "Missing Piece",
+        "question_type":  "SINGLE_CHOICE",
+        "prompt_text":  "Trong 5X, chữ nào còn thiếu: BX – CX – DX – FX – …?",
+        "options_json":  [
+                             {
+                                 "key":  "A",
+                                 "text":  "GX"
+                             },
+                             {
+                                 "key":  "B",
+                                 "text":  "PX"
+                             },
+                             {
+                                 "key":  "C",
+                                 "text":  "TX"
+                             }
+                         ],
+        "correct_answer_json":  {
+                                    "keys":  [
+                                                 "A"
+                                             ]
+                                },
+        "explanation":  "5X gồm BX, CX, DX, FX, GX.",
+        "reviewer_note":  "Sơ đồ 5X",
+        "shuffle_options":  true,
+        "mascot_pose":  "pointing",
+        "review_status":  "Da_duyet",
+        "needs_verification":  false
+    },
+    {
+        "question_code":  "B03",
+        "source_set":  "Bo_B",
+        "stage":  "LOOK",
+        "concept":  "Nhận diện hình",
+        "question_type":  "IMAGE_CHOICE",
+        "prompt_text":  "Trong sơ đồ 5X, chữ X nào xuất hiện giữa các trục chuyển đổi để thể hiện sự kết nối?",
+        "options_json":  [
+                             {
+                                 "key":  "A",
+                                 "text":  "BX"
+                             },
+                             {
+                                 "key":  "B",
+                                 "text":  "CX"
+                             },
+                             {
+                                 "key":  "C",
+                                 "text":  "FX"
+                             }
+                         ],
+        "correct_answer_json":  {
+                                    "keys":  [
+                                                 "B"
+                                             ]
+                                },
+        "explanation":  "CX thể hiện kết nối tin cậy giữa các trục chuyển đổi.",
+        "reviewer_note":  "Sơ đồ 5X gốc",
+        "shuffle_options":  true,
+        "mascot_pose":  "pointing",
+        "review_status":  "Da_duyet",
+        "needs_verification":  false
+    },
+    {
+        "question_code":  "B04",
+        "source_set":  "Bo_B",
+        "stage":  "LOOK",
+        "concept":  "Nhận diện hình",
+        "question_type":  "IMAGE_CHOICE",
+        "prompt_text":  "Hình ảnh nhà máy, cây xanh và cơ sở hạ tầng gắn với trục chuyển đổi nào?",
+        "options_json":  [
+                             {
+                                 "key":  "A",
+                                 "text":  "FX"
+                             },
+                             {
+                                 "key":  "B",
+                                 "text":  "BX"
+                             },
+                             {
+                                 "key":  "C",
+                                 "text":  "DX"
+                             }
+                         ],
+        "correct_answer_json":  {
+                                    "keys":  [
+                                                 "A"
+                                             ]
+                                },
+        "explanation":  "FX hướng đến cơ sở vật chất, môi trường làm việc và phát triển con người.",
+        "reviewer_note":  "Hình FX gốc",
+        "shuffle_options":  true,
+        "mascot_pose":  "pointing",
+        "review_status":  "Da_duyet",
+        "needs_verification":  false
+    },
+    {
+        "question_code":  "B05",
+        "source_set":  "Bo_B",
+        "stage":  "LOOK",
+        "concept":  "Nhận diện hình",
+        "question_type":  "IMAGE_CHOICE",
+        "prompt_text":  "Trong các biểu tượng 3C with I, hình nào thể hiện Challenge?",
+        "options_json":  [
+                             {
+                                 "key":  "A",
+                                 "text":  "Biểu tượng ngọn núi"
+                             },
+                             {
+                                 "key":  "B",
+                                 "text":  "Biểu tượng bắt tay"
+                             },
+                             {
+                                 "key":  "C",
+                                 "text":  "Biểu tượng trái tim"
+                             }
+                         ],
+        "correct_answer_json":  {
+                                    "keys":  [
+                                                 "A"
+                                             ]
+                                },
+        "explanation":  "Challenge thể hiện tinh thần chủ động thử thách hiện trạng, tìm cách tốt hơn.",
+        "reviewer_note":  "Cần xác nhận biểu tượng Challenge trên hình chính thức",
+        "shuffle_options":  true,
+        "mascot_pose":  "pointing",
+        "review_status":  "Can_chinh_sua",
+        "needs_verification":  true
+    },
+    {
+        "question_code":  "B06",
+        "source_set":  "Bo_B",
+        "stage":  "THINK",
+        "concept":  "DiVA",
+        "question_type":  "SINGLE_CHOICE",
+        "prompt_text":  "Điểm đặc biệt nhất trong quá trình xây dựng MMV Vision 2035 là gì?",
+        "options_json":  [
+                             {
+                                 "key":  "A",
+                                 "text":  "Vision được xây dựng hoàn toàn bởi HQ Nhật Bản."
+                             },
+                             {
+                                 "key":  "B",
+                                 "text":  "Vision được đội ngũ địa phương chủ động suy nghĩ, thảo luận và xây dựng."
+                             },
+                             {
+                                 "key":  "C",
+                                 "text":  "Vision được sao chép từ chiến lược của nhà máy khác."
+                             }
+                         ],
+        "correct_answer_json":  {
+                                    "keys":  [
+                                                 "B"
+                                             ]
+                                },
+        "explanation":  "DiVA = Discover Vietnam Autonomously – Khám phá nội lực Việt, dẫn dắt hành trình đổi mới. Đây là lần đầu Vision được đội ngũ địa phương chủ động suy nghĩ, thảo luận và tạo ra, với hỗ trợ của đồng nghiệp Nhật.",
+        "reviewer_note":  "",
+        "shuffle_options":  true,
+        "mascot_pose":  "thinking",
+        "review_status":  "Da_duyet",
+        "needs_verification":  false
+    },
+    {
+        "question_code":  "B07",
+        "source_set":  "Bo_B",
+        "stage":  "THINK",
+        "concept":  "Vision nhất quán",
+        "question_type":  "SINGLE_CHOICE",
+        "prompt_text":  "Vì sao MMV cần một Vision dài hạn và nhất quán, ngay cả khi lãnh đạo thay đổi?",
+        "options_json":  [
+                             {
+                                 "key":  "A",
+                                 "text":  "Để duy trì định hướng chung, không phụ thuộc vào một cá nhân."
+                             },
+                             {
+                                 "key":  "B",
+                                 "text":  "Để không cần điều chỉnh kế hoạch hằng năm."
+                             },
+                             {
+                                 "key":  "C",
+                                 "text":  "Để tất cả bộ phận luôn sử dụng cùng một phương pháp làm việc."
+                             }
+                         ],
+        "correct_answer_json":  {
+                                    "keys":  [
+                                                 "A"
+                                             ]
+                                },
+        "explanation":  "Vision tạo định hướng dài hạn nhất quán; kế hoạch vẫn có thể thay đổi.",
+        "reviewer_note":  "",
+        "shuffle_options":  true,
+        "mascot_pose":  "thinking",
+        "review_status":  "Da_duyet",
+        "needs_verification":  false
+    },
+    {
+        "question_code":  "B08",
+        "source_set":  "Bo_B",
+        "stage":  "THINK",
+        "concept":  "Decode Message",
+        "question_type":  "SINGLE_CHOICE",
+        "prompt_text":  "“Vươn xa không giới hạn” có nghĩa là MMV phải thay đổi liên tục, dù chưa xác định mục tiêu?",
+        "options_json":  [
+                             {
+                                 "key":  "A",
+                                 "text":  "Đúng, thay đổi càng nhiều càng tốt."
+                             },
+                             {
+                                 "key":  "B",
+                                 "text":  "Không. MMV cần chuyển đổi, phát triển và vượt giới hạn để tạo giá trị."
+                             },
+                             {
+                                 "key":  "C",
+                                 "text":  "Đúng, nếu có thể mở rộng quy mô sản xuất."
+                             }
+                         ],
+        "correct_answer_json":  {
+                                    "keys":  [
+                                                 "B"
+                                             ]
+                                },
+        "explanation":  "Beyond All Growth là chuyển đổi và phát triển không ngừng, không phải thay đổi thiếu định hướng.",
+        "reviewer_note":  "",
+        "shuffle_options":  true,
+        "mascot_pose":  "thinking",
+        "review_status":  "Da_duyet",
+        "needs_verification":  false
+    },
+    {
+        "question_code":  "B09",
+        "source_set":  "Bo_B",
+        "stage":  "THINK",
+        "concept":  "Think Twice GX",
+        "question_type":  "SINGLE_CHOICE",
+        "prompt_text":  "Một Genba có thể tự chủ xử lý công việc đã đủ để thực hiện GX Transformation chưa?",
+        "options_json":  [
+                             {
+                                 "key":  "A",
+                                 "text":  "Đủ, nếu nhân viên tự quyết định mọi việc."
+                             },
+                             {
+                                 "key":  "B",
+                                 "text":  "Đủ, nếu giảm được số lượng báo cáo."
+                             },
+                             {
+                                 "key":  "C",
+                                 "text":  "Chưa đủ, còn cần phòng ngừa vấn đề từ nguồn và tạo giá trị."
+                             }
+                         ],
+        "correct_answer_json":  {
+                                    "keys":  [
+                                                 "C"
+                                             ]
+                                },
+        "explanation":  "GX kết hợp Autonomous, Preventive và Momentum, tạo giá trị cho khách hàng và nhân viên.",
+        "reviewer_note":  "",
+        "shuffle_options":  true,
+        "mascot_pose":  "thinking",
+        "review_status":  "Da_duyet",
+        "needs_verification":  false
+    },
+    {
+        "question_code":  "B10",
+        "source_set":  "Bo_B",
+        "stage":  "THINK",
+        "concept":  "Challenge",
+        "question_type":  "SINGLE_CHOICE",
+        "prompt_text":  "Điều nào thể hiện đúng nhất tinh thần Challenge trong Vision?",
+        "options_json":  [
+                             {
+                                 "key":  "A",
+                                 "text":  "Chủ động thử thách hiện trạng, tìm cách tốt hơn để phát triển."
+                             },
+                             {
+                                 "key":  "B",
+                                 "text":  "Thay đổi mọi quy trình dù chưa xác định được lợi ích."
+                             },
+                             {
+                                 "key":  "C",
+                                 "text":  "Chỉ thực hiện cải tiến khi được giao nhiệm vụ."
+                             }
+                         ],
+        "correct_answer_json":  {
+                                    "keys":  [
+                                                 "A"
+                                             ]
+                                },
+        "explanation":  "Challenge nhấn mạnh chủ động tìm cách làm tốt hơn và phát triển.",
+        "reviewer_note":  "",
+        "shuffle_options":  true,
+        "mascot_pose":  "thinking",
+        "review_status":  "Da_duyet",
+        "needs_verification":  false
+    },
+    {
+        "question_code":  "B11",
+        "source_set":  "Bo_B",
+        "stage":  "THINK",
+        "concept":  "Commitment",
+        "question_type":  "SINGLE_CHOICE",
+        "prompt_text":  "Điều nào thể hiện đầy đủ nhất tinh thần Commitment?",
+        "options_json":  [
+                             {
+                                 "key":  "A",
+                                 "text":  "Hoàn thành công việc của mình rồi chuyển vấn đề cho người khác."
+                             },
+                             {
+                                 "key":  "B",
+                                 "text":  "Chủ động nhận trách nhiệm, không đổ lỗi và giải quyết vấn đề đến cùng."
+                             },
+                             {
+                                 "key":  "C",
+                                 "text":  "Nhận thêm công việc nhưng không cần quan tâm đến kết quả."
+                             }
+                         ],
+        "correct_answer_json":  {
+                                    "keys":  [
+                                                 "B"
+                                             ]
+                                },
+        "explanation":  "Commitment là không đổ lỗi, chủ động nhận trách nhiệm và kiên trì giải quyết vấn đề đến cùng.",
+        "reviewer_note":  "",
+        "shuffle_options":  true,
+        "mascot_pose":  "thinking",
+        "review_status":  "Da_duyet",
+        "needs_verification":  false
+    },
+    {
+        "question_code":  "B12",
+        "source_set":  "Bo_B",
+        "stage":  "CONNECT",
+        "concept":  "Ý tưởng mới",
+        "question_type":  "SINGLE_CHOICE",
+        "prompt_text":  "Một đồng nghiệp đề xuất cách làm mới, khác với cách nhóm vẫn thực hiện. Bạn sẽ làm gì?",
+        "options_json":  [
+                             {
+                                 "key":  "A",
+                                 "text":  "Lắng nghe và cùng đánh giá khả năng cải tiến."
+                             },
+                             {
+                                 "key":  "B",
+                                 "text":  "Từ chối vì cách làm hiện tại vẫn đang hoạt động."
+                             },
+                             {
+                                 "key":  "C",
+                                 "text":  "Để người đề xuất tự thử nghiệm mà không cần hỗ trợ."
+                             }
+                         ],
+        "correct_answer_json":  {
+                                    "keys":  [
+                                                 "A"
+                                             ]
+                                },
+        "explanation":  "Challenge và Collaboration khuyến khích thử thách hiện trạng và hỗ trợ nhau.",
+        "reviewer_note":  "",
+        "shuffle_options":  true,
+        "mascot_pose":  "wink",
+        "review_status":  "Da_duyet",
+        "needs_verification":  false
+    },
+    {
+        "question_code":  "B13",
+        "source_set":  "Bo_B",
+        "stage":  "CONNECT",
+        "concept":  "Integrity",
+        "question_type":  "SINGLE_CHOICE",
+        "prompt_text":  "Bạn phát hiện số liệu trong báo cáo có sai sót, nhưng điều chỉnh có thể làm KPI thấp hơn. Bạn sẽ làm gì?",
+        "options_json":  [
+                             {
+                                 "key":  "A",
+                                 "text":  "Giữ nguyên số liệu vì không ảnh hưởng nhiều."
+                             },
+                             {
+                                 "key":  "B",
+                                 "text":  "Chủ động báo cáo và điều chỉnh về số liệu chính xác."
+                             },
+                             {
+                                 "key":  "C",
+                                 "text":  "Chờ đến kỳ báo cáo tiếp theo mới điều chỉnh."
+                             }
+                         ],
+        "correct_answer_json":  {
+                                    "keys":  [
+                                                 "B"
+                                             ]
+                                },
+        "explanation":  "Integrity nhấn mạnh trung thực, chân thành và có trách nhiệm.",
+        "reviewer_note":  "",
+        "shuffle_options":  true,
+        "mascot_pose":  "wink",
+        "review_status":  "Da_duyet",
+        "needs_verification":  false
+    },
+    {
+        "question_code":  "B14",
+        "source_set":  "Bo_B",
+        "stage":  "CONNECT",
+        "concept":  "CX",
+        "question_type":  "SINGLE_CHOICE",
+        "prompt_text":  "Hai bộ phận có ý kiến khác nhau về cách giải quyết vấn đề. Cách nào phù hợp nhất với CX?",
+        "options_json":  [
+                             {
+                                 "key":  "A",
+                                 "text":  "Mỗi bộ phận bảo vệ phương án của mình đến cùng."
+                             },
+                             {
+                                 "key":  "B",
+                                 "text":  "Chuyển vấn đề lên cấp trên mà không cần trao đổi thêm."
+                             },
+                             {
+                                 "key":  "C",
+                                 "text":  "Lắng nghe, chia sẻ thông tin và cùng tìm giải pháp phù hợp."
+                             }
+                         ],
+        "correct_answer_json":  {
+                                    "keys":  [
+                                                 "C"
+                                             ]
+                                },
+        "explanation":  "CX nhấn mạnh niềm tin, vượt rào cản và hợp tác.",
+        "reviewer_note":  "",
+        "shuffle_options":  true,
+        "mascot_pose":  "wink",
+        "review_status":  "Da_duyet",
+        "needs_verification":  false
+    },
+    {
+        "question_code":  "B15",
+        "source_set":  "Bo_B",
+        "stage":  "CONNECT",
+        "concept":  "DiVA",
+        "question_type":  "SINGLE_CHOICE",
+        "prompt_text":  "Trong phạm vi được giao, nhân viên địa phương có đủ thông tin để giải quyết vấn đề. Hành động nào phù hợp với DiVA?",
+        "options_json":  [
+                             {
+                                 "key":  "A",
+                                 "text":  "Chủ động đánh giá và quyết định trong phạm vi thẩm quyền."
+                             },
+                             {
+                                 "key":  "B",
+                                 "text":  "Luôn chờ đồng nghiệp Nhật quyết định thay."
+                             },
+                             {
+                                 "key":  "C",
+                                 "text":  "Tránh đề xuất để không phát sinh trách nhiệm."
+                             }
+                         ],
+        "correct_answer_json":  {
+                                    "keys":  [
+                                                 "A"
+                                             ]
+                                },
+        "explanation":  "DiVA = Discover Vietnam Autonomously. Đây là lần đầu Vision được chính đội ngũ địa phương chủ động suy nghĩ, thảo luận và xây dựng, với hỗ trợ của đồng nghiệp Nhật. DiVA hướng đến năng lực tự chủ.",
+        "reviewer_note":  "",
+        "shuffle_options":  true,
+        "mascot_pose":  "wink",
+        "review_status":  "Da_duyet",
+        "needs_verification":  false
+    }
+]
