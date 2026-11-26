@@ -70,4 +70,4 @@ Tài liệu kiểm toán chi tiết toàn bộ 6 sheet trong [MMV_Vision_Quiz_2_
    - Trong Bộ A, toàn bộ 5 câu `A01`–`A05` đều có đáp án đúng là `A`. Nếu đưa nguyên lên web mà không trộn lựa chọn, người làm sẽ dễ đoán theo quy luật.
    - **Giải pháp hệ thống**: Hỗ trợ cột `shuffle_options = true` cho từng câu (tắt cờ này đối với các câu cố định theo nhãn hình như *“Hình A / Hình B / Cả hai”* ở `A05`).
 3. **Đồng bộ thêm câu hỏi từ Mockup UI**:
-   - Mockup [FFOxLAAAABklEQVQDABZOsBE3YU2tAAAAAElFTkSuQmCC.png](../../FFOxLAAAABklEQVQDABZOsBE3YU2tAAAAAElFTkSuQmCC.png) minh họa dạng **Chặng 2 THINK — điền nhiều chỗ trống (A–F)** và **Chặng 1 LOOK — chọn trực tiếp thẻ hình A/B/C**. Schema PostgreSQL trên Supabase đã thiết kế sẵn JSONB cho các dạng này để mở rộng ngân hàng câu hỏi lên 30–40 câu.
+   - Mockup [diva_quiz_ui_mockup.png](../../assets/diva_quiz_ui_mockup.png) minh họa dạng **Chặng 2 THINK — điền nhiều chỗ trống (A–F)** và **Chặng 1 LOOK — chọn trực tiếp thẻ hình A/B/C**. Schema PostgreSQL trên Supabase đã thiết kế sẵn JSONB cho các dạng này để mở rộng ngân hàng câu hỏi lên 30–40 câu.

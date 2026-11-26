@@ -1,9 +1,9 @@
 # 03. Hệ thống Thiết kế Giao diện DiVA (UI/UX Design System)
 
 Thiết kế giao diện phân hệ người chơi bám sát 100% nhận diện từ 3 file ảnh trong workspace:
-- [02bf1a05-c1e3-4f69-86ed-ab958ef0139f.png](../../02bf1a05-c1e3-4f69-86ed-ab958ef0139f.png) (DiVA Blueprint & Color Palette)
-- [e2862e18-4ac3-435f-b8f0-797447ac7ff4.png](../../e2862e18-4ac3-435f-b8f0-797447ac7ff4.png) (DiVA Emotion Expression Sheet)
-- [FFOxLAAAABklEQVQDABZOsBE3YU2tAAAAAElFTkSuQmCC.png](../../FFOxLAAAABklEQVQDABZOsBE3YU2tAAAAAElFTkSuQmCC.png) (4 Screen UI Mockups)
+- [diva_character_blueprint.png](../../assets/diva_character_blueprint.png) (DiVA Blueprint & Color Palette)
+- [diva_emotion_expressions.png](../../assets/diva_emotion_expressions.png) (DiVA Emotion Expression Sheet)
+- [diva_quiz_ui_mockup.png](../../assets/diva_quiz_ui_mockup.png) (4 Screen UI Mockups)
 
 ---
 

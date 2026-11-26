@@ -26,8 +26,8 @@ File gồm 6 sheet định nghĩa đầy đủ chương trình **“Khám phá V
     - **Vision Engagement Award**: **Tỷ lệ (%) tham gia hợp lệ theo từng bộ phận**, công bằng giữa phòng ban lớn và nhỏ.
 
 ### 1.2. Thiết kế Giao diện & Mascot từ 3 file ảnh
-- **Mascot DiVA** ([02bf1a05-c1e3-4f69-86ed-ab958ef0139f.png](../02bf1a05-c1e3-4f69-86ed-ab958ef0139f.png) & [e2862e18-4ac3-435f-b8f0-797447ac7ff4.png](../e2862e18-4ac3-435f-b8f0-797447ac7ff4.png)): Tắc kè hoa đội nón lá đỏ sao vàng, bảng màu chuẩn (`#8BC34A`, `#FFD54F`, `#FF8A00`, `#E53935`, `#FFEB3B`, `#42A5F5`, `#AB47BC`, `#FF6F91`, `#212121`), cùng bộ 8–11 biểu cảm/tư thế.
-- **Mockup UI 4 màn hình** ([FFOxLAAAABklEQVQDABZOsBE3YU2tAAAAAElFTkSuQmCC.png](../FFOxLAAAABklEQVQDABZOsBE3YU2tAAAAAElFTkSuQmCC.png)): Phong cách thẻ bài truyện tranh nền giấy parchment ấm, ruy-băng đỏ chữ vàng, tiến độ chấm tròn, và màn hình Chặng 2 THINK dạng điền nhiều chỗ trống (A–F).
+- **Mascot DiVA** ([diva_character_blueprint.png](../assets/diva_character_blueprint.png) & [diva_emotion_expressions.png](../assets/diva_emotion_expressions.png)): Tắc kè hoa đội nón lá đỏ sao vàng, bảng màu chuẩn (`#8BC34A`, `#FFD54F`, `#FF8A00`, `#E53935`, `#FFEB3B`, `#42A5F5`, `#AB47BC`, `#FF6F91`, `#212121`), cùng bộ 8–11 biểu cảm/tư thế.
+- **Mockup UI 4 màn hình** ([diva_quiz_ui_mockup.png](../assets/diva_quiz_ui_mockup.png)): Phong cách thẻ bài truyện tranh nền giấy parchment ấm, ruy-băng đỏ chữ vàng, tiến độ chấm tròn, và màn hình Chặng 2 THINK dạng điền nhiều chỗ trống (A–F).
 
 ---
 
