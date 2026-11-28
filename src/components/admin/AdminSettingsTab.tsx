@@ -1,3 +1,4 @@
+import { useI18n } from '@/lib/i18n'
 import React, { useState } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import * as XLSX from 'xlsx'
@@ -29,6 +30,7 @@ export const AdminSettingsTab: React.FC<AdminSettingsTabProps> = ({
   actorEmail,
   onRefresh,
 }) => {
+  const { t } = useI18n()
   const activeCamp = campaigns[0]
   const [campDraft, setCampDraft] = useState<Campaign | null>(activeCamp ? { ...activeCamp } : null)
   const [savedNotice, setSavedNotice] = useState<string | null>(null)
@@ -91,39 +93,27 @@ export const AdminSettingsTab: React.FC<AdminSettingsTabProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <Card className="lg:col-span-2">
             <CardHeader>
-              <CardTitle className="text-base">Cấu hình Chiến dịch Quiz</CardTitle>
-              <CardDescription>Điều chỉnh chế độ rút đề, ngưỡng thời gian hợp lệ và Webhook</CardDescription>
+              <CardTitle className="text-base">{t("Cấu hình Chiến dịch Quiz", "Survey campaign settings")}</CardTitle>
+            <CardDescription>{t("Điều chỉnh ngưỡng thời gian hợp lệ và Webhook", "Set the eligibility time threshold and webhook.")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <Label>Tên chiến dịch</Label>
+                  <Label>{t("Tên chiến dịch", "Campaign name")}</Label>
                   <Input
                     value={campDraft.title}
                     onChange={(e) => setCampDraft({ ...campDraft, title: e.target.value })}
                   />
                 </div>
                 <div>
-                  <Label>Chế độ bộ đề</Label>
-                  <Select
-                    value={campDraft.quiz_mode}
-                    onValueChange={(val: Campaign['quiz_mode']) =>
-                      setCampDraft({ ...campDraft, quiz_mode: val })
-                    }
-                  >
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Random_Pool_15">Ngẫu nhiên 15 câu (5-6-4)</SelectItem>
-                      <SelectItem value="Set_A">Bộ A cố định (Vision Explorer)</SelectItem>
-                      <SelectItem value="Set_B">Bộ B cố định (Think & Act)</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Label>{t("Bộ đề cho lượt mới", "Question set")}</Label>
+                  <p className="mt-2 text-sm">Vision 2035 · 5 Look, 6 Think, 4 Connect</p>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <Label>Trạng thái</Label>
+                  <Label>{t("Trạng thái", "Status")}</Label>
                   <Select
                     value={campDraft.status}
                     onValueChange={(val: Campaign['status']) =>
@@ -133,13 +123,13 @@ export const AdminSettingsTab: React.FC<AdminSettingsTabProps> = ({
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Draft">Draft</SelectItem>
-                      <SelectItem value="Active">Active (Đang mở)</SelectItem>
-                      <SelectItem value="Closed">Closed (Đã đóng)</SelectItem>
+                      <SelectItem value="Active">{t("Active (Đang mở)", "Active")}</SelectItem>
+                      <SelectItem value="Closed">{t("Closed (Đã đóng)", "Closed")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <Label>Giây tối thiểu hợp lệ</Label>
+                  <Label>{t("Giây tối thiểu hợp lệ", "Minimum eligible duration (seconds)")}</Label>
                   <Input
                     type="number"
                     value={campDraft.min_valid_seconds}
@@ -149,19 +139,13 @@ export const AdminSettingsTab: React.FC<AdminSettingsTabProps> = ({
                   />
                 </div>
                 <div>
-                  <Label>Số lượt tối đa (0 = không giới hạn)</Label>
-                  <Input
-                    type="number"
-                    value={campDraft.max_attempts}
-                    onChange={(e) =>
-                      setCampDraft({ ...campDraft, max_attempts: Number(e.target.value) || 0 })
-                    }
-                  />
+                  <Label>{t("Số lượt khảo sát", "Survey attempts")}</Label>
+                  <p className="mt-2 text-sm font-semibold">{t("1 lượt mỗi mã nhân viên", "One attempt per employee ID")}</p>
                 </div>
               </div>
 
               <div>
-                <Label>Google Sheet Webhook URL (Tùy chọn đồng bộ kết quả)</Label>
+                <Label>{t("Google Sheet Webhook URL (Tùy chọn đồng bộ kết quả)", "Google Sheets webhook URL (optional)")}</Label>
                 <Input
                   placeholder="https://script.google.com/macros/s/.../exec"
                   value={campDraft.google_sheet_webhook || ''}
@@ -175,10 +159,10 @@ export const AdminSettingsTab: React.FC<AdminSettingsTabProps> = ({
                     checked={campDraft.show_leaderboard}
                     onCheckedChange={(c) => setCampDraft({ ...campDraft, show_leaderboard: c })}
                   />
-                  <Label>Hiển thị bảng xếp hạng công khai</Label>
+                  <Label>{t("Hiển thị bảng xếp hạng công khai", "Show public leaderboard")}</Label>
                 </div>
                 <Button onClick={handleSaveCampaign}>
-                  <Save className="mr-2 h-4 w-4" /> Lưu cấu hình
+                  <Save className="mr-2 h-4 w-4" /> {t("Lưu cấu hình", "Save settings")}
                 </Button>
               </div>
             </CardContent>
@@ -187,9 +171,9 @@ export const AdminSettingsTab: React.FC<AdminSettingsTabProps> = ({
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
-                <QrCode className="h-4 w-4 text-diva-red" /> Mã QR cho xưởng Genba
+                <QrCode className="h-4 w-4 text-diva-red" /> {t("Mã QR cho xưởng Genba", "Genba QR code")}
               </CardTitle>
-              <CardDescription>In mã QR này dán tại bảng tin xưởng để công nhân quét làm bài</CardDescription>
+              <CardDescription>{t("In mã QR này dán tại bảng tin xưởng để công nhân quét làm bài", "Print this QR code for employees to open the survey.")}</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col items-center space-y-3">
               <div className="rounded-2xl border-2 border-diva-ink bg-white p-4">
@@ -206,14 +190,14 @@ export const AdminSettingsTab: React.FC<AdminSettingsTabProps> = ({
         <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
             <CardTitle className="flex items-center gap-2 text-base">
-              <Shield className="h-4 w-4 text-diva-blue" /> Quản lý Nhân sự & Phân quyền (RBAC)
+              <Shield className="h-4 w-4 text-diva-blue" /> {t("Quản lý Nhân sự & Phân quyền (RBAC)", "User roles & access")}
             </CardTitle>
             <CardDescription>
-              Cấp quyền Admin / Reviewer / HR Viewer và quản lý danh sách tính tỷ lệ Engagement
+              {t("Cấp quyền Admin / Reviewer / HR Viewer và quản lý danh sách tính tỷ lệ Engagement", "Manage Admin, Reviewer and HR Viewer permissions.")}
             </CardDescription>
           </div>
           <label className="inline-flex cursor-pointer items-center rounded-xl border bg-background px-3 py-2 text-sm font-semibold hover:bg-muted">
-            <Upload className="mr-2 h-4 w-4" /> Import Nhân sự (.xlsx)
+            <Upload className="mr-2 h-4 w-4" /> {t("Import Nhân sự (.xlsx)", "Import users (.xlsx)")}
             <input type="file" accept=".xlsx,.xls" className="hidden" onChange={handleImportUsers} />
           </label>
         </CardHeader>
@@ -221,11 +205,11 @@ export const AdminSettingsTab: React.FC<AdminSettingsTabProps> = ({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Mã NV</TableHead>
-                <TableHead>Họ tên / Email</TableHead>
-                <TableHead>Bộ phận / Khối</TableHead>
-                <TableHead>Vai trò (Role)</TableHead>
-                <TableHead>Kích hoạt</TableHead>
+                <TableHead>{t("Mã NV", "Employee ID")}</TableHead>
+                <TableHead>{t("Họ tên / Email", "Name / email")}</TableHead>
+                <TableHead>{t("Bộ phận / Khối", "Department / division")}</TableHead>
+                <TableHead>{t("Vai trò (Role)", "Role")}</TableHead>
+                <TableHead>{t("Kích hoạt", "Active")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -269,7 +253,7 @@ export const AdminSettingsTab: React.FC<AdminSettingsTabProps> = ({
       {/* Admin Audit Logs */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Nhật ký Thao tác Quản trị (Audit Logs)</CardTitle>
+          <CardTitle className="text-base">{t("Nhật ký Thao tác Quản trị (Audit Logs)", "Admin audit log")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2 max-h-60 overflow-y-auto">

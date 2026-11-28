@@ -1,3 +1,4 @@
+import { LanguageToggle, useI18n } from '@/lib/i18n'
 import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { ArrowLeft, KeyRound, Lock, RotateCcw, ShieldCheck, UserCog } from 'lucide-react'
@@ -17,6 +18,7 @@ const GATE_CODE = (import.meta.env.VITE_SECRET_GATE_CODE as string | undefined) 
 const GATE_UNLOCK_KEY = 'diva_secret_gate_unlocked_v1'
 
 export const SecretLoginPage: React.FC = () => {
+  const { t } = useI18n()
   const navigate = useNavigate()
   const [unlocked, setUnlocked] = useState<boolean>(
     () => sessionStorage.getItem(GATE_UNLOCK_KEY) === 'true'
@@ -59,6 +61,7 @@ export const SecretLoginPage: React.FC = () => {
   }
 
   const handleQuickRoleLogin = (role: UserRole) => {
+    if (!quizService.isDemoAvailable()) return
     const db = loadDemoDb()
     const target = db.users.find((u) => u.role === role)
     if (!target) return
@@ -76,7 +79,7 @@ export const SecretLoginPage: React.FC = () => {
 
   const handleResetDemo = () => {
     quizService.resetDemo()
-    setStatusMsg('Đã khôi phục dữ liệu mẫu (30 câu Excel + mẫu lượt thi + action logs) về ban đầu.')
+    setStatusMsg('Đã khôi phục bộ câu hỏi, lượt thi và nhật ký mẫu.')
   }
 
   return (
@@ -87,11 +90,9 @@ export const SecretLoginPage: React.FC = () => {
             to="/"
             className="inline-flex items-center gap-1.5 text-sm text-neutral-400 hover:text-white"
           >
-            <ArrowLeft className="h-4 w-4" /> Quay lại trang Quiz
+            <ArrowLeft className="h-4 w-4" /> {t("Quay lại trang Quiz", "Back to the survey")}
           </Link>
-          <Badge variant="outline" className="border-amber-500/40 text-amber-300">
-            <Lock className="mr-1 h-3 w-3" /> Secret Testing Gate
-          </Badge>
+          <LanguageToggle />
         </div>
 
         <Card className="border-neutral-800 bg-neutral-900 text-neutral-100 shadow-2xl">
@@ -99,9 +100,9 @@ export const SecretLoginPage: React.FC = () => {
             <div className="flex items-center gap-3">
               <DivaMascot pose="wink" size="sm" />
               <div>
-                <CardTitle className="text-xl text-white">Cổng Đăng nhập Bí mật & Kiểm tra</CardTitle>
+                <CardTitle className="text-xl text-white">{t("Cổng Đăng nhập Bí mật & Kiểm tra", "Admin sign-in")}</CardTitle>
                 <CardDescription className="text-neutral-400">
-                  Dành riêng cho Admin, Reviewer, HR và kiểm thử nhanh toàn bộ Role
+                  {t("Dành riêng cho Admin, Reviewer, HR và kiểm thử nhanh toàn bộ Role", "For Admins, Reviewers and HR")}
                 </CardDescription>
               </div>
             </div>
@@ -112,18 +113,18 @@ export const SecretLoginPage: React.FC = () => {
               <form onSubmit={handleUnlockGate} className="space-y-3">
                 <div className="space-y-1.5">
                   <Label htmlFor="gate-code" className="text-neutral-200">
-                    Nhập Mã cổng bí mật (Secret Gate Code)
+                    {t("Nhập Mã cổng bí mật (Secret Gate Code)", "Enter the portal access code")}
                   </Label>
                   <Input
                     id="gate-code"
                     type="password"
                     value={gateInput}
                     onChange={(e) => setGateInput(e.target.value)}
-                    placeholder="Nhập mã truy cập..."
+                    placeholder={t("Nhập mã truy cập...", "Access code")}
                     className="bg-neutral-800 border-neutral-700 text-white"
                   />
                   <p className="text-xs text-neutral-400">
-                    Mặc định cấu hình test: <code className="text-amber-300">{GATE_CODE}</code> (đổi được qua{' '}
+                    {t("Mặc định cấu hình test:", "Default demo code:")} <code className="text-amber-300">{GATE_CODE}</code> {t("(đổi được qua", "(configurable via")}{' '}
                     <code>VITE_SECRET_GATE_CODE</code>).
                   </p>
                 </div>
@@ -135,7 +136,7 @@ export const SecretLoginPage: React.FC = () => {
                 )}
 
                 <Button type="submit" className="w-full bg-diva-red hover:bg-diva-red/90">
-                  <KeyRound className="mr-2 h-4 w-4" /> Mở khóa Cổng Kiểm tra
+                  <KeyRound className="mr-2 h-4 w-4" /> {t("Mở khóa Cổng Kiểm tra", "Unlock admin portal")}
                 </Button>
               </form>
             ) : (
@@ -143,12 +144,12 @@ export const SecretLoginPage: React.FC = () => {
                 {currentSession && (
                   <div className="flex items-center justify-between rounded-xl border border-neutral-800 bg-neutral-800/60 px-3.5 py-2.5 text-xs">
                     <span>
-                      Đang đăng nhập: <strong>{currentSession.user.full_name}</strong> ({currentSession.user.role})
+                      {t("Đang đăng nhập:", "Signed in as:")} <strong>{currentSession.user.full_name}</strong> ({currentSession.user.role})
                     </span>
                     <div className="flex gap-2">
                       {currentSession.user.role !== 'employee' && (
                         <Button size="sm" variant="secondary" onClick={() => navigate('/admin')}>
-                          Vào Admin
+                          {t("Vào Admin", "Open admin portal")}
                         </Button>
                       )}
                       <Button
@@ -160,21 +161,21 @@ export const SecretLoginPage: React.FC = () => {
                           setStatusMsg('Đã đăng xuất phiên hiện tại.')
                         }}
                       >
-                        Đăng xuất
+                        {t("Đăng xuất", "Sign out")}
                       </Button>
                     </div>
                   </div>
                 )}
 
-                <Tabs defaultValue={quizService.isUsingSupabase() ? 'supabase' : 'demo'}>
-                  <TabsList className="grid w-full grid-cols-2 bg-neutral-800">
-                    <TabsTrigger value="demo">Kiểm thử nhanh theo Role</TabsTrigger>
-                    <TabsTrigger value="supabase">Supabase Auth (Production)</TabsTrigger>
-                  </TabsList>
+                <Tabs defaultValue={quizService.isDemoAvailable() ? 'demo' : 'supabase'}>
+                  {quizService.isDemoAvailable() && <TabsList className="grid w-full grid-cols-2 bg-neutral-800">
+                    <TabsTrigger value="demo">{t("Kiểm thử nhanh theo Role", "Demo roles")}</TabsTrigger>
+                    <TabsTrigger value="supabase">Supabase Auth</TabsTrigger>
+                  </TabsList>}
 
                   <TabsContent value="demo" className="space-y-3 pt-2">
                     <p className="text-xs text-neutral-400">
-                      Chọn 1 vai trò bên dưới để vào kiểm tra ngay giao diện thực tế, phân quyền RBAC và dữ liệu Action Logs:
+                      {t("Chọn 1 vai trò bên dưới để vào kiểm tra ngay giao diện thực tế, phân quyền RBAC và dữ liệu Action Logs:", "Choose a role to preview its interface and access.")}
                     </p>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -185,8 +186,8 @@ export const SecretLoginPage: React.FC = () => {
                       >
                         <ShieldCheck className="mr-2.5 h-5 w-5 text-diva-red shrink-0" />
                         <div>
-                          <div className="font-bold">Admin (Toàn quyền)</div>
-                          <div className="text-[11px] text-neutral-400">Dashboard, Câu hỏi, Action Logs, RBAC</div>
+                          <div className="font-bold">{t("Admin (Toàn quyền)", "Admin (full access)")}</div>
+                          <div className="text-[11px] text-neutral-400">{t("Dashboard, Câu hỏi, Action Logs, RBAC", "Dashboard, questions, logs and access")}</div>
                         </div>
                       </Button>
 
@@ -197,8 +198,8 @@ export const SecretLoginPage: React.FC = () => {
                       >
                         <UserCog className="mr-2.5 h-5 w-5 text-amber-400 shrink-0" />
                         <div>
-                          <div className="font-bold">Reviewer (Duyệt đề)</div>
-                          <div className="text-[11px] text-neutral-400">Sửa/Duyệt câu hỏi, Import Excel</div>
+                          <div className="font-bold">{t("Reviewer (Duyệt đề)", "Reviewer (question review)")}</div>
+                          <div className="text-[11px] text-neutral-400">{t("Sửa/Duyệt câu hỏi, Import Excel", "Edit and review questions")}</div>
                         </div>
                       </Button>
 
@@ -210,7 +211,7 @@ export const SecretLoginPage: React.FC = () => {
                         <UserCog className="mr-2.5 h-5 w-5 text-sky-400 shrink-0" />
                         <div>
                           <div className="font-bold">HR / Manager</div>
-                          <div className="text-[11px] text-neutral-400">Xem giải thưởng, % phòng ban, Export</div>
+                          <div className="text-[11px] text-neutral-400">{t("Xem giải thưởng, % phòng ban, Export", "View awards, department participation and exports")}</div>
                         </div>
                       </Button>
 
@@ -222,7 +223,7 @@ export const SecretLoginPage: React.FC = () => {
                         <UserCog className="mr-2.5 h-5 w-5 text-diva-green shrink-0" />
                         <div>
                           <div className="font-bold">Employee (Genba)</div>
-                          <div className="text-[11px] text-neutral-400">Làm Quiz & bị chặn nếu vào /admin</div>
+                          <div className="text-[11px] text-neutral-400">{t("Làm Quiz & bị chặn nếu vào /admin", "Take the survey")}</div>
                         </div>
                       </Button>
                     </div>
@@ -234,7 +235,7 @@ export const SecretLoginPage: React.FC = () => {
                         className="text-neutral-400 hover:text-white"
                         onClick={handleResetDemo}
                       >
-                        <RotateCcw className="mr-1.5 h-3.5 w-3.5" /> Reset dữ liệu Demo
+                        <RotateCcw className="mr-1.5 h-3.5 w-3.5" /> {t("Reset dữ liệu Demo", "Reset demo data")}
                       </Button>
                     </div>
                   </TabsContent>
@@ -243,14 +244,14 @@ export const SecretLoginPage: React.FC = () => {
                     {!quizService.isUsingSupabase() && (
                       <Alert variant="warning">
                         <AlertDescription>
-                          Chưa phát hiện <code>VITE_SUPABASE_URL</code> trong file <code>.env</code>. Hiện web đang chạy chế độ Demo Local.
+                          {t("Chưa cấu hình", "Missing configuration for")} <code>VITE_SUPABASE_URL</code> {t("và", "and")} <code>VITE_SUPABASE_ANON_KEY</code>.
                         </AlertDescription>
                       </Alert>
                     )}
 
                     <form onSubmit={handleSupabaseLogin} className="space-y-3">
                       <div className="space-y-1.5">
-                        <Label htmlFor="sb-email">Email Quản trị / HR / Reviewer</Label>
+                        <Label htmlFor="sb-email">{t("Email Quản trị / HR / Reviewer", "Admin, HR or Reviewer email")}</Label>
                         <Input
                           id="sb-email"
                           type="email"
@@ -262,7 +263,7 @@ export const SecretLoginPage: React.FC = () => {
                         />
                       </div>
                       <div className="space-y-1.5">
-                        <Label htmlFor="sb-pass">Mật khẩu</Label>
+                        <Label htmlFor="sb-pass">{t("Mật khẩu", "Password")}</Label>
                         <Input
                           id="sb-pass"
                           type="password"
@@ -281,7 +282,7 @@ export const SecretLoginPage: React.FC = () => {
                       )}
 
                       <Button type="submit" disabled={loading} className="w-full bg-diva-red hover:bg-diva-red/90">
-                        {loading ? 'Đang đăng nhập...' : 'Đăng nhập qua Supabase Auth'}
+                        {loading ? t("Đang đăng nhập...", "Signing in…") : t("Đăng nhập qua Supabase Auth", "Sign in with Supabase")}
                       </Button>
                     </form>
                   </TabsContent>

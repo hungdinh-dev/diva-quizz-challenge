@@ -1,0 +1,602 @@
+insert into public.questions (question_code, source_set, stage, concept, question_type, prompt_text, options_json, correct_answer_json, explanation, media_urls_json, shuffle_options, mascot_pose, review_status)
+select question_code, source_set, stage, concept, question_type, prompt_text, options_json, correct_answer_json, explanation, media_urls_json, shuffle_options, mascot_pose, review_status
+from jsonb_populate_recordset(null::public.questions, $questions$
+[
+  {
+    "question_code": "V2035-01",
+    "source_set": "Bo_A",
+    "stage": "LOOK",
+    "concept": "Look",
+    "question_type": "IMAGE_CHOICE",
+    "prompt_text": "Linh vật nào đại diện cho tinh thần linh hoạt và đổi mới của MMV?",
+    "options_json": [
+      {
+        "key": "A",
+        "text": "Chim én",
+        "imageUrl": "/assets/vision2035/1.C.webp"
+      },
+      {
+        "key": "B",
+        "text": "Rồng",
+        "imageUrl": "/assets/vision2035/1.B.webp"
+      },
+      {
+        "key": "C",
+        "text": "Tắc kè hoa",
+        "imageUrl": "/assets/vision2035/1.A.webp"
+      }
+    ],
+    "correct_answer_json": {
+      "keys": [
+        "C"
+      ]
+    },
+    "explanation": "Đáp án đúng là “Tắc kè hoa”.",
+    "media_urls_json": [],
+    "shuffle_options": false,
+    "mascot_pose": "explore",
+    "review_status": "Da_duyet"
+  },
+  {
+    "question_code": "V2035-02",
+    "source_set": "Bo_A",
+    "stage": "LOOK",
+    "concept": "Look",
+    "question_type": "IMAGE_CHOICE",
+    "prompt_text": "Hoàn thành thông điệp: “Linh hoạt để đổi mới – …”",
+    "options_json": [
+      {
+        "key": "A",
+        "text": "Vượt qua mọi đối thủ",
+        "imageUrl": "/assets/vision2035/2.A.webp"
+      },
+      {
+        "key": "B",
+        "text": "Phát triển cùng công nghệ",
+        "imageUrl": "/assets/vision2035/2.B.webp"
+      },
+      {
+        "key": "C",
+        "text": "Kiên trì với niềm vui",
+        "imageUrl": "/assets/vision2035/2.C.webp"
+      }
+    ],
+    "correct_answer_json": {
+      "keys": [
+        "C"
+      ]
+    },
+    "explanation": "Đáp án đúng là “Kiên trì với niềm vui”.",
+    "media_urls_json": [],
+    "shuffle_options": false,
+    "mascot_pose": "explore",
+    "review_status": "Da_duyet"
+  },
+  {
+    "question_code": "V2035-03",
+    "source_set": "Bo_A",
+    "stage": "LOOK",
+    "concept": "Look",
+    "question_type": "IMAGE_CHOICE",
+    "prompt_text": "Trong ba hình biểu tượng DX, FX và GX, hình nào đại diện cho chuyển đổi kỹ thuật số?",
+    "options_json": [
+      {
+        "key": "A",
+        "text": "Hình FX",
+        "imageUrl": "/assets/vision2035/3.B.webp"
+      },
+      {
+        "key": "B",
+        "text": "Hình DX",
+        "imageUrl": "/assets/vision2035/3.A.webp"
+      },
+      {
+        "key": "C",
+        "text": "Hình GX",
+        "imageUrl": "/assets/vision2035/3.C.webp"
+      }
+    ],
+    "correct_answer_json": {
+      "keys": [
+        "B"
+      ]
+    },
+    "explanation": "Đáp án đúng là “Hình DX”.",
+    "media_urls_json": [],
+    "shuffle_options": false,
+    "mascot_pose": "explore",
+    "review_status": "Da_duyet"
+  },
+  {
+    "question_code": "V2035-04",
+    "source_set": "Bo_A",
+    "stage": "LOOK",
+    "concept": "Look",
+    "question_type": "IMAGE_CHOICE",
+    "prompt_text": "Biểu tượng bắt tay trong 3C with I thể hiện giá trị nào?",
+    "options_json": [
+      {
+        "key": "A",
+        "text": "Hợp tác",
+        "imageUrl": "/assets/vision2035/4.A.webp"
+      },
+      {
+        "key": "B",
+        "text": "Cam kết",
+        "imageUrl": "/assets/vision2035/4.B.webp"
+      },
+      {
+        "key": "C",
+        "text": "Chính trực"
+      }
+    ],
+    "correct_answer_json": {
+      "keys": [
+        "A"
+      ]
+    },
+    "explanation": "Đáp án đúng là “Hợp tác”.",
+    "media_urls_json": [],
+    "shuffle_options": false,
+    "mascot_pose": "explore",
+    "review_status": "Da_duyet"
+  },
+  {
+    "question_code": "V2035-05",
+    "source_set": "Bo_A",
+    "stage": "LOOK",
+    "concept": "Look",
+    "question_type": "IMAGE_CHOICE",
+    "prompt_text": "Quan sát hai hình Vision. Hình nào có đầy đủ bốn giá trị 3C with I?",
+    "options_json": [
+      {
+        "key": "A",
+        "text": "Hình A",
+        "imageUrl": "/assets/vision2035/5.A.webp"
+      },
+      {
+        "key": "B",
+        "text": "Hình B",
+        "imageUrl": "/assets/vision2035/5.B.webp"
+      }
+    ],
+    "correct_answer_json": {
+      "keys": [
+        "A"
+      ]
+    },
+    "explanation": "Đáp án đúng là “Hình A”.",
+    "media_urls_json": [],
+    "shuffle_options": false,
+    "mascot_pose": "explore",
+    "review_status": "Da_duyet"
+  },
+  {
+    "question_code": "V2035-06",
+    "source_set": "Bo_A",
+    "stage": "THINK",
+    "concept": "Think",
+    "question_type": "SINGLE_CHOICE",
+    "prompt_text": "Theo Vision 2035, MMV mong muốn trở thành công ty được những ai tin tưởng lựa chọn?",
+    "options_json": [
+      {
+        "key": "A",
+        "text": "Chỉ khách hàng"
+      },
+      {
+        "key": "B",
+        "text": "Khách hàng, nhân viên và xã hội"
+      },
+      {
+        "key": "C",
+        "text": "Chỉ nhân viên và đối tác"
+      }
+    ],
+    "correct_answer_json": {
+      "keys": [
+        "B"
+      ]
+    },
+    "explanation": "Đáp án đúng là “Khách hàng, nhân viên và xã hội”.",
+    "media_urls_json": [],
+    "shuffle_options": false,
+    "mascot_pose": "thinking",
+    "review_status": "Da_duyet"
+  },
+  {
+    "question_code": "V2035-07",
+    "source_set": "Bo_A",
+    "stage": "THINK",
+    "concept": "Think",
+    "question_type": "SINGLE_CHOICE",
+    "prompt_text": "Một công ty có sản phẩm chất lượng tốt đã đủ để trở thành “Sự tin chọn cho tương lai” chưa?",
+    "options_json": [
+      {
+        "key": "A",
+        "text": "Đủ, vì chất lượng là yếu tố quan trọng nhất."
+      },
+      {
+        "key": "B",
+        "text": "Chưa đủ, vì MMV còn cần tạo giá trị cho nhân viên và xã hội."
+      },
+      {
+        "key": "C",
+        "text": "Đủ, nếu khách hàng tiếp tục đặt hàng."
+      }
+    ],
+    "correct_answer_json": {
+      "keys": [
+        "B"
+      ]
+    },
+    "explanation": "Đáp án đúng là “Chưa đủ, vì MMV còn cần tạo giá trị cho nhân viên và xã hội.”.",
+    "media_urls_json": [],
+    "shuffle_options": false,
+    "mascot_pose": "thinking",
+    "review_status": "Da_duyet"
+  },
+  {
+    "question_code": "V2035-08",
+    "source_set": "Bo_A",
+    "stage": "THINK",
+    "concept": "Think",
+    "question_type": "SINGLE_CHOICE",
+    "prompt_text": "Điểm chung quan trọng nhất giữa Agility và Gritty Joy là gì?",
+    "options_json": [
+      {
+        "key": "A",
+        "text": "Luôn thay đổi thật nhanh trong mọi tình huống."
+      },
+      {
+        "key": "B",
+        "text": "Chỉ tập trung đạt kết quả cuối cùng."
+      },
+      {
+        "key": "C",
+        "text": "Linh hoạt trước thay đổi và kiên trì vượt khó với tinh thần tích cực."
+      }
+    ],
+    "correct_answer_json": {
+      "keys": [
+        "C"
+      ]
+    },
+    "explanation": "Đáp án đúng là “Linh hoạt trước thay đổi và kiên trì vượt khó với tinh thần tích cực.”.",
+    "media_urls_json": [],
+    "shuffle_options": false,
+    "mascot_pose": "thinking",
+    "review_status": "Da_duyet"
+  },
+  {
+    "question_code": "V2035-09",
+    "source_set": "Bo_A",
+    "stage": "THINK",
+    "concept": "Think",
+    "question_type": "SINGLE_CHOICE",
+    "prompt_text": "Nhận định nào CHƯA phù hợp với tinh thần Localization trong DiVA?",
+    "options_json": [
+      {
+        "key": "A",
+        "text": "Nhân viên Việt Nam chủ động suy nghĩ và đề xuất."
+      },
+      {
+        "key": "B",
+        "text": "Nhân viên Việt Nam phải tự làm mọi việc, không cần hỗ trợ từ Nhật."
+      },
+      {
+        "key": "C",
+        "text": "Nhân viên Việt Nam từng bước nâng cao năng lực tự chủ."
+      }
+    ],
+    "correct_answer_json": {
+      "keys": [
+        "B"
+      ]
+    },
+    "explanation": "Đáp án đúng là “Nhân viên Việt Nam phải tự làm mọi việc, không cần hỗ trợ từ Nhật.”.",
+    "media_urls_json": [],
+    "shuffle_options": false,
+    "mascot_pose": "thinking",
+    "review_status": "Da_duyet"
+  },
+  {
+    "question_code": "V2035-10",
+    "source_set": "Bo_A",
+    "stage": "THINK",
+    "concept": "Think",
+    "question_type": "SINGLE_CHOICE",
+    "prompt_text": "CX có vai trò như thế nào đối với BX, DX, FX và GX?",
+    "options_json": [
+      {
+        "key": "A",
+        "text": "Thay thế nhiệm vụ của các trục còn lại."
+      },
+      {
+        "key": "B",
+        "text": "Chỉ truyền đạt kết quả sau khi các trục hoàn thành."
+      },
+      {
+        "key": "C",
+        "text": "Kết nối con người, xây dựng niềm tin và thúc đẩy hợp tác giữa các trục."
+      }
+    ],
+    "correct_answer_json": {
+      "keys": [
+        "C"
+      ]
+    },
+    "explanation": "Đáp án đúng là “Kết nối con người, xây dựng niềm tin và thúc đẩy hợp tác giữa các trục.”.",
+    "media_urls_json": [],
+    "shuffle_options": false,
+    "mascot_pose": "thinking",
+    "review_status": "Da_duyet"
+  },
+  {
+    "question_code": "V2035-11",
+    "source_set": "Bo_A",
+    "stage": "THINK",
+    "concept": "Think",
+    "question_type": "SINGLE_CHOICE",
+    "prompt_text": "Nhận định nào CHƯA phản ánh đúng tinh thần Collaboration?",
+    "options_json": [
+      {
+        "key": "A",
+        "text": "Tôn trọng sự khác biệt."
+      },
+      {
+        "key": "B",
+        "text": "Mọi người phải luôn có cùng ý kiến."
+      },
+      {
+        "key": "C",
+        "text": "Hỗ trợ lẫn nhau và hướng đến mục tiêu chung."
+      }
+    ],
+    "correct_answer_json": {
+      "keys": [
+        "B"
+      ]
+    },
+    "explanation": "Đáp án đúng là “Mọi người phải luôn có cùng ý kiến.”.",
+    "media_urls_json": [],
+    "shuffle_options": false,
+    "mascot_pose": "thinking",
+    "review_status": "Da_duyet"
+  },
+  {
+    "question_code": "V2035-12",
+    "source_set": "Bo_A",
+    "stage": "CONNECT",
+    "concept": "Quality Protection",
+    "question_type": "ACTION_BUILDER",
+    "prompt_text": "Bạn phát hiện dấu hiệu bất thường có thể ảnh hưởng đến chất lượng sản phẩm. Bạn sẽ làm gì?",
+    "options_json": [
+      {
+        "key": "Q12-L01",
+        "text": "Chờ xảy ra lỗi",
+        "selectionLimit": 3
+      },
+      {
+        "key": "Q12-L02",
+        "text": "Phòng ngừa",
+        "selectionLimit": 3
+      },
+      {
+        "key": "Q12-L03",
+        "text": "Chủ động báo cáo",
+        "selectionLimit": 3
+      },
+      {
+        "key": "Q12-L04",
+        "text": "Bỏ qua",
+        "selectionLimit": 3
+      },
+      {
+        "key": "Q12-L05",
+        "text": "Phối hợp tìm nguyên nhân",
+        "selectionLimit": 3
+      },
+      {
+        "key": "Q12-L06",
+        "text": "Tiếp tục sản xuất",
+        "selectionLimit": 3
+      },
+      {
+        "key": "Q12-L07",
+        "text": "Giữ im lặng",
+        "selectionLimit": 3
+      }
+    ],
+    "correct_answer_json": {
+      "keys": [
+        "Q12-L02",
+        "Q12-L03",
+        "Q12-L05"
+      ]
+    },
+    "explanation": "Chủ động báo cáo, phối hợp tìm nguyên nhân và phòng ngừa.",
+    "media_urls_json": [],
+    "shuffle_options": true,
+    "mascot_pose": "running",
+    "review_status": "Da_duyet"
+  },
+  {
+    "question_code": "V2035-13",
+    "source_set": "Bo_A",
+    "stage": "CONNECT",
+    "concept": "Commitment Builder",
+    "question_type": "ACTION_BUILDER",
+    "prompt_text": "Một vấn đề phát sinh liên quan đến nhiều bộ phận. Hành động nào thể hiện Commitment?",
+    "options_json": [
+      {
+        "key": "Q13-L01",
+        "text": "Đùn đẩy trách nhiệm",
+        "selectionLimit": 3
+      },
+      {
+        "key": "Q13-L02",
+        "text": "Theo dõi tiến độ",
+        "selectionLimit": 3
+      },
+      {
+        "key": "Q13-L03",
+        "text": "Chờ bộ phận khác",
+        "selectionLimit": 3
+      },
+      {
+        "key": "Q13-L04",
+        "text": "Chủ động phối hợp",
+        "selectionLimit": 3
+      },
+      {
+        "key": "Q13-L05",
+        "text": "Chỉ làm phần việc của mình",
+        "selectionLimit": 3
+      },
+      {
+        "key": "Q13-L06",
+        "text": "Giải quyết đến cùng",
+        "selectionLimit": 3
+      },
+      {
+        "key": "Q13-L07",
+        "text": "Bỏ cuộc",
+        "selectionLimit": 3
+      }
+    ],
+    "correct_answer_json": {
+      "keys": [
+        "Q13-L02",
+        "Q13-L04",
+        "Q13-L06"
+      ]
+    },
+    "explanation": "Chủ động phối hợp và theo dõi giải quyết đến cùng.",
+    "media_urls_json": [],
+    "shuffle_options": true,
+    "mascot_pose": "running",
+    "review_status": "Da_duyet"
+  },
+  {
+    "question_code": "V2035-14",
+    "source_set": "Bo_A",
+    "stage": "CONNECT",
+    "concept": "Gritty Joy Builder",
+    "question_type": "ACTION_BUILDER",
+    "prompt_text": "Nhóm gặp khó khăn trong quá trình cải tiến và chưa đạt kết quả mong muốn. Hành động nào thể hiện Gritty Joy?",
+    "options_json": [
+      {
+        "key": "Q14-L01",
+        "text": "Dừng cải tiến",
+        "selectionLimit": 3
+      },
+      {
+        "key": "Q14-L02",
+        "text": "Tinh thần tích cực",
+        "selectionLimit": 3
+      },
+      {
+        "key": "Q14-L03",
+        "text": "Chờ quản lý quyết định",
+        "selectionLimit": 3
+      },
+      {
+        "key": "Q14-L04",
+        "text": "Cùng nhau tìm giải pháp",
+        "selectionLimit": 3
+      },
+      {
+        "key": "Q14-L05",
+        "text": "Đổ lỗi",
+        "selectionLimit": 3
+      },
+      {
+        "key": "Q14-L06",
+        "text": "Kiên trì vượt khó",
+        "selectionLimit": 3
+      },
+      {
+        "key": "Q14-L07",
+        "text": "Nản chí",
+        "selectionLimit": 3
+      }
+    ],
+    "correct_answer_json": {
+      "keys": [
+        "Q14-L02",
+        "Q14-L04",
+        "Q14-L06"
+      ]
+    },
+    "explanation": "Tiếp tục cùng nhau tìm giải pháp với tinh thần tích cực.",
+    "media_urls_json": [],
+    "shuffle_options": true,
+    "mascot_pose": "running",
+    "review_status": "Da_duyet"
+  },
+  {
+    "question_code": "V2035-15",
+    "source_set": "Bo_A",
+    "stage": "CONNECT",
+    "concept": "Final Vision Puzzle",
+    "question_type": "ACTION_BUILDER",
+    "prompt_text": "Hành động nào góp phần đưa MMV trở thành “Sự tin chọn cho tương lai”?",
+    "options_json": [
+      {
+        "key": "Q15-L01",
+        "text": "Chỉ quan tâm bộ phận mình",
+        "selectionLimit": 4
+      },
+      {
+        "key": "Q15-L02",
+        "text": "Hợp tác",
+        "selectionLimit": 4
+      },
+      {
+        "key": "Q15-L03",
+        "text": "Giữ chất lượng",
+        "selectionLimit": 4
+      },
+      {
+        "key": "Q15-L04",
+        "text": "Chờ chỉ thị",
+        "selectionLimit": 4
+      },
+      {
+        "key": "Q15-L05",
+        "text": "Cải tiến",
+        "selectionLimit": 4
+      },
+      {
+        "key": "Q15-L06",
+        "text": "Cạnh tranh nội bộ",
+        "selectionLimit": 4
+      },
+      {
+        "key": "Q15-L07",
+        "text": "Xây dựng môi trường làm việc tốt",
+        "selectionLimit": 4
+      },
+      {
+        "key": "Q15-L08",
+        "text": "Ngại thay đổi",
+        "selectionLimit": 4
+      }
+    ],
+    "correct_answer_json": {
+      "keys": [
+        "Q15-L02",
+        "Q15-L03",
+        "Q15-L05",
+        "Q15-L07"
+      ]
+    },
+    "explanation": "Giữ chất lượng, hợp tác, cải tiến và cùng tạo môi trường làm việc tốt.",
+    "media_urls_json": [],
+    "shuffle_options": true,
+    "mascot_pose": "running",
+    "review_status": "Da_duyet"
+  }
+]
+$questions$::jsonb)
+on conflict (question_code) do nothing;

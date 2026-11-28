@@ -14,6 +14,7 @@ dist-ssr
 .env
 .env.local
 .env.*.local
+doc/ListCus/Files/MMV 2711.xlsx
 
 # Editor
 .vscode/*

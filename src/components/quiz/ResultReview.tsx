@@ -1,233 +1,187 @@
-import React, { useState } from 'react'
-import { Award, CheckCircle2, Clock, Filter, RotateCcw, Sparkles, XCircle } from 'lucide-react'
+import React, { useMemo, useState } from 'react'
+import { Award, Check, CheckCircle2, ChevronDown, Clock, Home, X, XCircle } from 'lucide-react'
 import { DivaMascot } from '@/components/diva/DivaMascot'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import type { SubmitQuizResponse } from '@/types/quiz'
+import type { Stage, SubmitQuizResponse } from '@/types/quiz'
+import { useI18n } from '@/lib/i18n'
+import { localizeQuestion } from '@/data/questionEnglish'
 
 interface ResultReviewProps {
   result: SubmitQuizResponse
   employeeName: string
+  employeeCode: string
   department: string
+  controls?: React.ReactNode
   onViewExplanation: (questionCode: string, filterMode: string) => void
-  onPlayAgain: () => void
+  onReturnHome: () => void
 }
 
-function formatDuration(sec: number): string {
-  const m = Math.floor(sec / 60)
-  const s = sec % 60
-  return `${m} phút ${s.toString().padStart(2, '0')} giây`
-}
+const STAGES: Stage[] = ['LOOK', 'THINK', 'CONNECT']
 
 export const ResultReview: React.FC<ResultReviewProps> = ({
   result,
   employeeName,
+  employeeCode,
   department,
+  controls,
   onViewExplanation,
-  onPlayAgain,
+  onReturnHome,
 }) => {
+  const { locale, t } = useI18n()
   const [filterMode, setFilterMode] = useState<'all' | 'wrong'>('all')
   const pct = result.total > 0 ? Math.round((result.score / result.total) * 100) : 0
   const pose = pct >= 85 ? 'cheering' : pct >= 60 ? 'excited' : 'determined'
+  const headline = pct >= 85
+    ? t('Xuất sắc! Bạn là Vision Explorer thực thụ!', 'Outstanding! A true Vision Explorer!')
+    : pct >= 60
+      ? t('Làm tốt lắm! Bạn đã hiểu rõ Vision 2035.', 'Well done! You know Vision 2035 well.')
+      : t('Cảm ơn bạn đã hoàn thành hành trình!', 'Thanks for completing the journey!')
 
-  const filteredItems =
-    filterMode === 'wrong' ? result.review.filter((r) => !r.is_correct) : result.review
+  const stageTotals = useMemo(() => {
+    const totals: Record<Stage, number> = { LOOK: 0, THINK: 0, CONNECT: 0 }
+    result.review.forEach((item) => { totals[item.stage] += 1 })
+    return totals
+  }, [result.review])
+
+  const wrongCount = result.review.filter((r) => !r.is_correct).length
+  const filteredItems = filterMode === 'wrong' ? result.review.filter((r) => !r.is_correct) : result.review
 
   const handleFilterChange = (mode: 'all' | 'wrong') => {
     setFilterMode(mode)
     onViewExplanation('ALL', mode)
   }
 
-  return (
-    <div className="mx-auto max-w-3xl space-y-5 pb-12 animate-question-enter">
-      {/* Celebration Card */}
-      <Card className="relative overflow-hidden border-4 border-diva-ink shadow-comic bg-diva-parchment">
-        {pct >= 60 && (
-          <div className="pointer-events-none absolute inset-x-0 top-14 flex justify-around opacity-85">
-            {['#FFD54F', '#8BC34A', '#42A5F5', '#FF6F91', '#FF8A00'].map((color, idx) => (
-              <span
-                key={idx}
-                className="h-3 w-3 rounded-sm animate-confetti"
-                style={{ backgroundColor: color, animationDelay: `${idx * 0.35}s` }}
-              />
-            ))}
-          </div>
-        )}
+  const minutes = Math.floor(result.duration_seconds / 60)
+  const seconds = result.duration_seconds % 60
+  const durationText = locale === 'vi'
+    ? minutes + ' phút ' + String(seconds).padStart(2, '0') + ' giây'
+    : minutes + ' min ' + String(seconds).padStart(2, '0') + ' sec'
 
-        <div className="bg-diva-red px-5 py-3 text-center text-white border-b-4 border-diva-ink">
-          <h2 className="font-display text-xl sm:text-2xl font-extrabold tracking-wide flex items-center justify-center gap-2">
-            <Sparkles className="h-5 w-5 text-diva-yellow" />
-            HOÀN THÀNH HÀNH TRÌNH VISION 2035!
-          </h2>
+  const optionLabel = (options: { key: string; text: string }[], key: string) => options.find((o) => o.key === key)?.text ?? key
+
+  return (
+    <main className="dv-result">
+      <section className="dv-result-hero">
+        <div className="mx-auto flex w-[min(100%-2rem,56rem)] justify-end pt-4">{controls}</div>
+        <div className="mx-auto flex w-[min(100%-2rem,56rem)] flex-col items-center gap-6 pb-16 pt-4 text-center sm:flex-row sm:text-left">
+          <div className="relative flex shrink-0 items-end gap-2 dv-enter">
+            <DivaMascot pose={pose} size="lg" className="!h-32 !w-32 sm:!h-44 sm:!w-44 lg:!h-56 lg:!w-56" />
+            <div className="dv-score-ring" style={{ '--p': pct } as React.CSSProperties}
+              role="img" aria-label={t('Điểm', 'Score') + ' ' + result.score + '/' + result.total}>
+              <div>
+                <div className="font-display text-[2.6rem] font-extrabold sm:text-5xl">{result.score}<span className="text-2xl text-[color:var(--dv-ink-soft)]">/{result.total}</span></div>
+                <div className="mt-1 text-sm font-extrabold text-[color:var(--dv-ink-soft)]">{pct}%</div>
+              </div>
+            </div>
+          </div>
+          <div className="min-w-0 dv-enter-2">
+            <p className="dv-eyebrow text-diva-yellow">{t('Hoàn thành hành trình', 'Journey complete')}</p>
+            <h1 className="mt-2 font-display text-3xl font-extrabold leading-tight sm:text-[2.6rem]" style={{ textWrap: 'balance' } as React.CSSProperties}>{headline}</h1>
+            <p className="mt-2 text-sm font-semibold text-white/85">
+              {employeeName} · {employeeCode}{department ? ' · ' + department : ''}
+            </p>
+            <div className="mt-4 flex flex-wrap justify-center gap-2 sm:justify-start">
+              <span className="dv-fact !border-white/40"><Clock aria-hidden className="!text-diva-yellow" />{durationText}</span>
+              {result.is_valid_for_award ? (
+                <span className="dv-fact !border-white/40"><Award aria-hidden className="!text-diva-yellow" />{t('Hợp lệ xét giải Champion & Engagement', 'Eligible for Champion & Engagement awards')}</span>
+              ) : (
+                <span className="dv-fact !border-white/40">{locale === 'vi' && result.invalid_reason ? result.invalid_reason : t('Không tính giải thưởng', 'Not eligible for awards')}</span>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="mx-auto w-[min(100%-2rem,56rem)] pb-16">
+        {/* Stage breakdown */}
+        <div className="-mt-10 grid grid-cols-1 gap-3 sm:grid-cols-3 dv-enter-3">
+          {STAGES.map((stage, idx) => {
+            const score = result.score_by_stage[stage] ?? 0
+            const total = stageTotals[stage]
+            return (
+              <div key={stage} className={'dv-stage-score dv-stage-' + stage.toLowerCase()}>
+                <div className="flex items-baseline justify-between gap-2">
+                  <span className="text-xs font-extrabold tracking-wider text-[color:var(--dv-ink-soft)]">{t('CHẶNG', 'STAGE')} {idx + 1} · {stage}</span>
+                  <span className="font-display text-2xl font-extrabold" style={{ color: 'var(--stage)' }}>{score}<span className="text-base text-[color:var(--dv-ink-soft)]">/{total}</span></span>
+                </div>
+                <div className="dv-stage-score-bar"><span style={{ width: (total ? (score / total) * 100 : 0) + '%' }} /></div>
+              </div>
+            )
+          })}
         </div>
 
-        <CardContent className="p-5 sm:p-6">
-          <div className="flex flex-col sm:flex-row items-center gap-5">
-            <DivaMascot pose={pose} size="lg" />
-
-            <div className="flex-1 text-center sm:text-left space-y-3">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  {employeeName} • {department}
-                </p>
-                <div className="mt-1 flex items-baseline justify-center sm:justify-start gap-2">
-                  <span className="font-display text-4xl sm:text-5xl font-extrabold text-diva-red">
-                    {result.score}/{result.total}
-                  </span>
-                  <span className="text-lg font-bold text-diva-ink">({pct}%)</span>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap justify-center sm:justify-start gap-2">
-                <Badge variant="outline" className="bg-white border-diva-ink/30 py-1">
-                  <Clock className="mr-1 h-3.5 w-3.5 text-diva-orange" />
-                  {formatDuration(result.duration_seconds)}
-                </Badge>
-                {result.is_valid_for_award ? (
-                  <Badge variant="success" className="py-1">
-                    <Award className="mr-1 h-3.5 w-3.5" />
-                    Lượt hợp lệ xét giải Champion & Engagement
-                  </Badge>
-                ) : (
-                  <Badge variant="warning" className="py-1">
-                    {result.invalid_reason || 'Lượt ôn tập'}
-                  </Badge>
-                )}
-              </div>
-
-              {/* Stage Breakdown */}
-              <div className="grid grid-cols-3 gap-2 pt-1">
-                <div className="rounded-xl border-2 border-diva-ink/20 bg-white p-2 text-center shadow-sm">
-                  <div className="text-[11px] font-bold text-muted-foreground">CHẶNG 1: LOOK</div>
-                  <div className="font-display text-lg font-extrabold text-diva-ink">
-                    {result.score_by_stage.LOOK}
-                  </div>
-                </div>
-                <div className="rounded-xl border-2 border-diva-ink/20 bg-white p-2 text-center shadow-sm">
-                  <div className="text-[11px] font-bold text-muted-foreground">CHẶNG 2: THINK</div>
-                  <div className="font-display text-lg font-extrabold text-diva-blue">
-                    {result.score_by_stage.THINK}
-                  </div>
-                </div>
-                <div className="rounded-xl border-2 border-diva-ink/20 bg-white p-2 text-center shadow-sm">
-                  <div className="text-[11px] font-bold text-muted-foreground">CHẶNG 3: CONNECT</div>
-                  <div className="font-display text-lg font-extrabold text-diva-green">
-                    {result.score_by_stage.CONNECT}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Review & Explanations */}
-      <Card className="border-2 border-diva-ink/20">
-        <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3">
+        {/* Review */}
+        <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <CardTitle className="text-lg">Xem lại Đáp án & Giải thích từ DiVA</CardTitle>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              Biến mỗi câu hỏi thành một lần hiểu sâu hơn về MMV Vision 2035
-            </p>
+            <h2 className="font-display text-2xl font-extrabold">{t('Xem lại đáp án', 'Review your answers')}</h2>
+            <p className="text-sm font-semibold text-[color:var(--dv-ink-soft)]">{t('Chạm vào từng câu để xem chi tiết.', 'Tap a question to see the details.')}</p>
           </div>
-
-          <div className="flex items-center gap-2">
-            <Button
-              size="sm"
-              variant={filterMode === 'all' ? 'default' : 'outline'}
-              onClick={() => handleFilterChange('all')}
-            >
-              Tất cả ({result.review.length})
-            </Button>
-            <Button
-              size="sm"
-              variant={filterMode === 'wrong' ? 'default' : 'outline'}
-              onClick={() => handleFilterChange('wrong')}
-            >
-              <Filter className="mr-1 h-3.5 w-3.5" />
-              Câu chưa đúng ({result.review.filter((r) => !r.is_correct).length})
-            </Button>
+          <div className="dv-tabs self-start sm:self-auto">
+            <button type="button" aria-pressed={filterMode === 'all'} onClick={() => handleFilterChange('all')}>
+              {t('Tất cả', 'All')} ({result.review.length})
+            </button>
+            <button type="button" aria-pressed={filterMode === 'wrong'} onClick={() => handleFilterChange('wrong')}>
+              {t('Chưa đúng', 'Incorrect')} ({wrongCount})
+            </button>
           </div>
-        </CardHeader>
+        </div>
 
-        <CardContent className="space-y-3">
+        <div className="mt-4 space-y-3">
           {filteredItems.length === 0 ? (
-            <div className="rounded-xl bg-emerald-50 p-6 text-center text-emerald-800 font-medium">
-              Xuất sắc! Bạn đã trả lời đúng toàn bộ 100% câu hỏi!
+            <div className="dv-review-item flex items-center gap-3 p-5">
+              <DivaMascot pose="cheering" size="sm" />
+              <p className="font-bold">{t('Tuyệt vời! Bạn không trả lời sai câu nào.', 'Amazing! You didn’t miss a single question.')}</p>
             </div>
           ) : (
-            filteredItems.map((item) => {
-              const userText = item.user_answer
-                .map((k) => {
-                  const found = item.options_json.find((o) => o.key === k)
-                  return found ? `${k}. ${found.text}` : k
-                })
-                .join(', ')
-              const correctText = item.correct_answer
-                .map((k) => {
-                  const found = item.options_json.find((o) => o.key === k)
-                  return found ? `${k}. ${found.text}` : k
-                })
-                .join(', ')
-
+            filteredItems.map((rawItem) => {
+              const item = localizeQuestion(rawItem, locale)
+              const number = result.review.findIndex((r) => r.question_code === item.question_code) + 1
               return (
-                <div
-                  key={item.question_code}
-                  onClick={() => onViewExplanation(item.question_code, filterMode)}
-                  className="rounded-xl border bg-card p-4 space-y-2 hover:border-diva-ink/40 transition-colors"
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline">{item.question_code}</Badge>
-                      <Badge variant="secondary">{item.stage}</Badge>
-                      <span className="text-xs text-muted-foreground">{item.concept}</span>
-                    </div>
-                    {item.is_correct ? (
-                      <Badge variant="success">
-                        <CheckCircle2 className="mr-1 h-3.5 w-3.5" /> Chính xác
-                      </Badge>
-                    ) : (
-                      <Badge variant="destructive">
-                        <XCircle className="mr-1 h-3.5 w-3.5" /> Chưa đúng
-                      </Badge>
+                <details key={item.question_code} className="dv-review-item"
+                  onToggle={(event) => { if ((event.currentTarget as HTMLDetailsElement).open) onViewExplanation(item.question_code, filterMode) }}>
+                  <summary className="flex items-center gap-3 p-4">
+                    <span className="dv-review-status" style={{ background: item.is_correct ? 'var(--dv-ok-bg)' : 'var(--dv-bad-bg)', color: item.is_correct ? 'var(--dv-ok)' : 'var(--dv-bad)' }}
+                      aria-label={item.is_correct ? t('Đúng', 'Correct') : t('Sai', 'Incorrect')}>
+                      {item.is_correct ? <CheckCircle2 /> : <XCircle />}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-xs font-extrabold tracking-wider text-[color:var(--dv-ink-soft)]">
+                        {t('CÂU', 'Q')} {String(number).padStart(2, '0')} · {item.stage}
+                      </span>
+                      <span className="mt-0.5 block font-bold leading-snug">{item.prompt_text}</span>
+                    </span>
+                    <ChevronDown className="dv-review-chevron h-5 w-5 shrink-0" aria-hidden />
+                  </summary>
+                  <div className="space-y-2 border-t-2 border-dashed border-[color:var(--dv-line)] p-4 text-sm">
+                    <p className="flex items-start gap-2">
+                      {item.is_correct ? <Check className="mt-0.5 h-4 w-4 shrink-0 text-[color:var(--dv-ok)]" strokeWidth={3} /> : <X className="mt-0.5 h-4 w-4 shrink-0 text-[color:var(--dv-bad)]" strokeWidth={3} />}
+                      <span><span className="font-bold text-[color:var(--dv-ink-soft)]">{t('Bạn chọn', 'Your answer')}: </span>
+                        <span className="font-semibold">{item.user_answer.length ? item.user_answer.map((k) => optionLabel(item.options_json, k)).join(' · ') : t('(Chưa chọn)', '(No answer)')}</span></span>
+                    </p>
+                    {!item.is_correct && (
+                      <p className="flex items-start gap-2">
+                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-[color:var(--dv-ok)]" strokeWidth={3} />
+                        <span><span className="font-bold text-[color:var(--dv-ink-soft)]">{t('Đáp án đúng', 'Correct answer')}: </span>
+                          <span className="font-semibold text-[color:var(--dv-ok)]">{item.correct_answer.map((k) => optionLabel(item.options_json, k)).join(' · ')}</span></span>
+                      </p>
+                    )}
+                    {locale === 'vi' && item.explanation && (
+                      <p className="rounded-xl border-2 border-[#e9c96b] bg-[#fff7d6] px-3 py-2 leading-relaxed">
+                        <span className="font-extrabold">💡 Giải thích: </span>{item.explanation}
+                      </p>
                     )}
                   </div>
-
-                  <p className="font-semibold text-sm sm:text-base">{item.prompt_text}</p>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
-                    <div className="rounded-lg bg-muted/60 px-3 py-2">
-                      <span className="font-semibold text-muted-foreground">Bạn chọn: </span>
-                      <span className={item.is_correct ? 'text-emerald-700 font-semibold' : 'text-red-600 font-semibold'}>
-                        {userText || '(Chưa chọn)'}
-                      </span>
-                    </div>
-                    <div className="rounded-lg bg-emerald-50 px-3 py-2">
-                      <span className="font-semibold text-emerald-800">Đáp án đúng: </span>
-                      <span className="text-emerald-900 font-semibold">{correctText}</span>
-                    </div>
-                  </div>
-
-                  {item.explanation && (
-                    <div className="rounded-lg border border-amber-200 bg-amber-50/70 px-3 py-2 text-xs sm:text-sm text-amber-950">
-                      <span className="font-bold">Giải thích DiVA: </span>
-                      {item.explanation}
-                    </div>
-                  )}
-                </div>
+                </details>
               )
             })
           )}
-        </CardContent>
-      </Card>
+        </div>
 
-      <div className="flex justify-center">
-        <Button variant="comic" size="lg" className="btn-comic-shine" onClick={onPlayAgain}>
-          <RotateCcw className="mr-2 h-4 w-4" />
-          Quay về Màn hình Chính / Làm lượt ôn tập
-        </Button>
+        <div className="mt-10 flex justify-center">
+          <button type="button" className="dv-btn dv-btn-lg" onClick={onReturnHome}>
+            <Home className="h-5 w-5" aria-hidden />{t('Về trang chủ', 'Back to home')}
+          </button>
+        </div>
       </div>
-    </div>
+    </main>
   )
 }

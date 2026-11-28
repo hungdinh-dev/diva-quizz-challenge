@@ -1,3 +1,4 @@
+import { useI18n } from '@/lib/i18n'
 import React, { useMemo } from 'react'
 import * as XLSX from 'xlsx'
 import { Award, Building2, Download, Smartphone, Trophy, Users } from 'lucide-react'
@@ -19,6 +20,7 @@ export const AdminDashboardTab: React.FC<AdminDashboardTabProps> = ({
   attempts,
   actionLogs,
 }) => {
+  const { t } = useI18n()
   const activeUsers = useMemo(() => users.filter((u) => u.is_active), [users])
   const completedAttempts = useMemo(
     () => attempts.filter((a) => a.status === 'Completed'),
@@ -132,13 +134,13 @@ export const AdminDashboardTab: React.FC<AdminDashboardTabProps> = ({
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl font-bold tracking-tight">Tổng quan & Xét giải Vision 2035</h2>
+          <h2 className="text-xl font-bold tracking-tight">{t("Tổng quan & Xét giải Vision 2035", "Vision 2035 overview & awards")}</h2>
           <p className="text-sm text-muted-foreground">
-            Theo dõi tỷ lệ tham gia theo phòng ban và xếp hạng cá nhân hợp lệ
+            {t("Theo dõi tỷ lệ tham gia theo phòng ban và xếp hạng cá nhân hợp lệ", "Track department participation and eligible rankings.")}
           </p>
         </div>
         <Button onClick={handleExportExcel} variant="outline" className="shrink-0">
-          <Download className="mr-2 h-4 w-4" /> Xuất Báo cáo Excel (.xlsx)
+          <Download className="mr-2 h-4 w-4" /> {t("Xuất Báo cáo Excel (.xlsx)", "Export awards report (.xlsx)")}
         </Button>
       </div>
 
@@ -146,7 +148,7 @@ export const AdminDashboardTab: React.FC<AdminDashboardTabProps> = ({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Tham gia Hợp lệ</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t("Tham gia Hợp lệ", "Eligible participation")}</CardTitle>
             <Users className="h-4 w-4 text-diva-red" />
           </CardHeader>
           <CardContent>
@@ -154,45 +156,45 @@ export const AdminDashboardTab: React.FC<AdminDashboardTabProps> = ({
               {uniqueValidEmployees.size} / {activeUsers.length}
             </div>
             <Progress value={companyParticipationPct} className="mt-2" />
-            <p className="text-xs text-muted-foreground mt-1.5">{companyParticipationPct}% toàn công ty</p>
+            <p className="text-xs text-muted-foreground mt-1.5">{companyParticipationPct}{t("% toàn công ty", "% company-wide")}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Điểm Trung bình</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t("Điểm Trung bình", "Average score")}</CardTitle>
             <Award className="h-4 w-4 text-diva-orange" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{avgScore} / 15</div>
             <p className="text-xs text-muted-foreground mt-1">
-              Tính trên {validAttempts.length} lượt hợp lệ đầu tiên
+              {t("Tính trên", "Based on")} {validAttempts.length} {t("lượt hợp lệ đầu tiên", "first eligible attempts")}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Tổng Action Logs</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t("Tổng Action Logs", "Recorded events")}</CardTitle>
             <Trophy className="h-4 w-4 text-diva-blue" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{actionLogs.length}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              Sự kiện từng bước được ghi nhận
+              {t("Sự kiện từng bước được ghi nhận", "Events captured during the survey")}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Thiết bị Mobile</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t("Thiết bị Mobile", "Mobile devices")}</CardTitle>
             <Smartphone className="h-4 w-4 text-diva-green" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{mobilePct}%</div>
             <p className="text-xs text-muted-foreground mt-1">
-              {mobileCount} / {completedAttempts.length} lượt hoàn thành bằng điện thoại
+              {mobileCount} / {completedAttempts.length} {t("lượt hoàn thành bằng điện thoại", "attempts completed on a phone")}
             </p>
           </CardContent>
         </Card>
@@ -203,9 +205,9 @@ export const AdminDashboardTab: React.FC<AdminDashboardTabProps> = ({
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
-              <Building2 className="h-4 w-4 text-diva-blue" /> Vision Engagement Award (Theo Bộ phận)
+              <Building2 className="h-4 w-4 text-diva-blue" /> {t("Vision Engagement Award (Theo Bộ phận)", "Vision Engagement Award (department)")}
             </CardTitle>
-            <CardDescription>Xếp hạng theo % nhân sự hoàn thành hợp lệ (công bằng phòng nhỏ & lớn)</CardDescription>
+            <CardDescription>{t("Xếp hạng theo % nhân sự hoàn thành hợp lệ (công bằng phòng nhỏ & lớn)", "Ranked by the percentage of eligible completions.")}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -216,7 +218,7 @@ export const AdminDashboardTab: React.FC<AdminDashboardTabProps> = ({
                       #{idx + 1} {d.department}
                     </span>
                     <span className="text-xs font-medium text-muted-foreground">
-                      {d.completedEmployees}/{d.totalEmployees} NV ({d.pct}%) • TB {d.avgScore}đ
+                      {d.completedEmployees}/{d.totalEmployees} NV ({d.pct}%) • TB {d.avgScore}{t("đ", "pts")}
                     </span>
                   </div>
                   <Progress value={d.pct} />
@@ -229,25 +231,25 @@ export const AdminDashboardTab: React.FC<AdminDashboardTabProps> = ({
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
-              <Trophy className="h-4 w-4 text-diva-orange" /> Vision Champion Award (Cá nhân)
+              <Trophy className="h-4 w-4 text-diva-orange" /> {t("Vision Champion Award (Cá nhân)", "Vision Champion Award (individual)")}
             </CardTitle>
-            <CardDescription>Điểm cao nhất; đồng điểm xét thời gian hoàn thành nhanh hơn</CardDescription>
+            <CardDescription>{t("Điểm cao nhất; đồng điểm xét thời gian hoàn thành nhanh hơn", "Highest score, with completion time as the tiebreaker.")}</CardDescription>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Hạng</TableHead>
-                  <TableHead>Nhân viên</TableHead>
-                  <TableHead>Điểm</TableHead>
-                  <TableHead>Thời gian</TableHead>
+                  <TableHead>{t("Hạng", "Rank")}</TableHead>
+                  <TableHead>{t("Nhân viên", "Employee")}</TableHead>
+                  <TableHead>{t("Điểm", "Score")}</TableHead>
+                  <TableHead>{t("Thời gian", "Time")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {championRanking.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={4} className="text-center text-muted-foreground">
-                      Chưa có lượt thi hợp lệ.
+                      {t("Chưa có lượt thi hợp lệ.", "No eligible attempts yet.")}
                     </TableCell>
                   </TableRow>
                 ) : (

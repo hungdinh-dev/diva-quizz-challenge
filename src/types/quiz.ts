@@ -7,6 +7,7 @@ export type QuestionType =
   | 'MULTI_FILL_BLANK'
   | 'TRUE_FALSE'
   | 'SPOT_DIFFERENCE'
+  | 'ACTION_BUILDER'
 export type ReviewStatus = 'Chua_duyet' | 'Can_chinh_sua' | 'Da_duyet' | 'Archived'
 
 export interface UserProfile {
@@ -41,6 +42,32 @@ export interface QuestionOption {
   key: string
   text: string
   imageUrl?: string
+  selectionLimit?: number
+}
+
+export interface EmployeeRosterEntry {
+  source_number: number
+  employee_code: string
+  full_name: string
+  company_code: string
+}
+
+export interface EmployeeProgress extends Omit<EmployeeRosterEntry, 'source_number'> {
+  first_verified_at: string | null
+  status: 'NotStarted' | 'InProgress' | 'Completed'
+  attempts: number
+  retries: number
+  score: number | null
+  total: number | null
+  duration_seconds: number | null
+  submitted_at: string | null
+}
+
+export interface EmployeeVisit {
+  id: string
+  employee_code: string
+  full_name: string
+  verified_at: string
 }
 
 export interface QuestionItem {
@@ -100,6 +127,7 @@ export interface QuizAttempt {
   selected_questions_json: string[]
   draft_answers_json: Record<string, string[]>
   final_answers_json?: Record<string, string[]>
+  question_feedback_json?: Record<string, QuizReviewItem>
   score: number
   score_by_stage?: { LOOK: number; THINK: number; CONNECT: number }
   duration_seconds?: number

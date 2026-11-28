@@ -1,4 +1,3 @@
-import excelQuestionsRaw from '@/data/excelQuestions.json'
 import type {
   AdminAuditLog,
   Campaign,
@@ -9,6 +8,10 @@ import type {
 } from '@/types/quiz'
 
 const STORAGE_KEY = 'diva_quiz_demo_db_v1'
+const devQuestionData = import.meta.env.DEV
+  ? import.meta.glob<QuestionItem[]>('../data/vision2035Questions.json', { eager: true, import: 'default' })
+  : {}
+const visionQuestions = devQuestionData['../data/vision2035Questions.json'] ?? []
 
 export interface DemoDatabase {
   users: UserProfile[]
@@ -17,33 +20,6 @@ export interface DemoDatabase {
   attempts: QuizAttempt[]
   actionLogs: QuizActionEvent[]
   auditLogs: AdminAuditLog[]
-}
-
-const bonusMockupQuestion: QuestionItem = {
-  id: 'q-m01',
-  question_code: 'M01',
-  source_set: 'Bo_Sung',
-  stage: 'THINK',
-  concept: 'Missing Piece',
-  question_type: 'MULTI_FILL_BLANK',
-  prompt_text:
-    'DiVA hướng đến việc trở thành một chuỗi cung ứng {{blank_1}}, {{blank_2}}, và {{blank_3}} để tạo giá trị bền vững cho khách hàng.',
-  options_json: [
-    { key: 'A', text: 'Linh hoạt' },
-    { key: 'B', text: 'Hiệu quả' },
-    { key: 'C', text: 'An toàn' },
-    { key: 'D', text: 'Bền vững' },
-    { key: 'E', text: 'Sáng tạo' },
-    { key: 'F', text: 'Ổn định' },
-  ],
-  correct_answer_json: { keys: ['A', 'B', 'D'] },
-  explanation:
-    'Theo minh họa DiVA Concept: chuỗi cung ứng Linh hoạt, Hiệu quả và Bền vững giúp MMV tạo giá trị lâu dài cho khách hàng.',
-  shuffle_options: false,
-  mascot_pose: 'thinking',
-  review_status: 'Chua_duyet',
-  reviewer_note: 'Câu bổ sung theo ảnh Mockup Chặng 2 THINK (bật Đã duyệt để đưa vào pool)',
-  needs_verification: true,
 }
 
 const initialUsers: UserProfile[] = [
@@ -136,7 +112,7 @@ const initialCampaigns: Campaign[] = [
     title: 'Khám phá Vision 2035 – Hiểu Vision, vui cùng MMV!',
     quiz_mode: 'Random_Pool_15',
     stage_mix: { LOOK: 5, THINK: 6, CONNECT: 4 },
-    max_attempts: 0,
+    max_attempts: 1,
     min_valid_seconds: 60,
     suggested_minutes: 10,
     start_at: new Date(Date.now() - 86400000 * 3).toISOString(),
@@ -274,14 +250,10 @@ const seedActionLogs: QuizActionEvent[] = [
 ]
 
 function buildInitialDb(): DemoDatabase {
-  const excelQuestions = (excelQuestionsRaw as QuestionItem[]).map((q, idx) => ({
-    ...q,
-    id: q.id || `q-${idx + 1}`,
-  }))
   return {
     users: initialUsers,
     campaigns: initialCampaigns,
-    questions: [...excelQuestions, bonusMockupQuestion],
+    questions: visionQuestions,
     attempts: seedAttempts,
     actionLogs: seedActionLogs,
     auditLogs: [
@@ -305,7 +277,16 @@ export function loadDemoDb(): DemoDatabase {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(init))
       return init
     }
-    return JSON.parse(raw) as DemoDatabase
+    const db = JSON.parse(raw) as DemoDatabase
+    const existing = new Map(db.questions.map((question) => [question.question_code, question]))
+    db.questions = visionQuestions.map((question) => {
+      const saved = existing.get(question.question_code)
+      if (!saved) return question
+      if (saved.question_code !== 'V2035-04') return saved
+      return { ...saved, options_json: saved.options_json.map((option) => option.key === 'C'
+        ? { ...option, imageUrl: '/assets/vision2035/4.C.webp' } : option) }
+    })
+    return db
   } catch {
     const init = buildInitialDb()
     localStorage.setItem(STORAGE_KEY, JSON.stringify(init))

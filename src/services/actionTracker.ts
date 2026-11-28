@@ -10,11 +10,12 @@ export class ActionTracker {
   private seq: number = 0
   private pending: QuizActionEvent[] = []
 
-  constructor(attemptId: string, attemptToken: string, employeeCode: string) {
+  constructor(attemptId: string, attemptToken: string, employeeCode: string, lastEventSeq = 0) {
     this.attemptId = attemptId
     this.attemptToken = attemptToken
     this.employeeCode = employeeCode
     this.restoreFromStorage()
+    this.seq = Math.max(this.seq, lastEventSeq)
   }
 
   private get storageKey(): string {

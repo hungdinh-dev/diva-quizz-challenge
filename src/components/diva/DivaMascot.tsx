@@ -6,6 +6,7 @@ export type DivaPose =
   | 'pointing'
   | 'presenting'
   | 'thinking'
+  | 'stage_think'
   | 'running'
   | 'explore'
   | 'cheering'
@@ -23,25 +24,26 @@ export type DivaPose =
   | 'wink'
 
 const POSE_TO_FILE: Record<DivaPose, string> = {
-  hero_presenting: '/assets/mascot/hero_presenting.png',
-  pointing: '/assets/mascot/pointing.png',
-  presenting: '/assets/mascot/presenting.png',
-  thinking: '/assets/mascot/thinking.png',
-  running: '/assets/mascot/running.png',
-  explore: '/assets/mascot/explore.png',
-  cheering: '/assets/mascot/cheering.png',
-  happy: '/assets/mascot/happy.png',
-  excited: '/assets/mascot/excited.png',
-  curious: '/assets/mascot/curious.png',
-  surprised: '/assets/mascot/surprised.png',
-  confused: '/assets/mascot/confused.png',
-  worried: '/assets/mascot/worried.png',
-  sad: '/assets/mascot/sad.png',
-  angry: '/assets/mascot/angry.png',
-  determined: '/assets/mascot/determined.png',
-  sleepy: '/assets/mascot/sleepy.png',
-  laughing: '/assets/mascot/laughing.png',
-  wink: '/assets/mascot/wink.png',
+  hero_presenting: '/assets/vision2035/welcome.webp',
+  pointing: '/assets/vision2035/connect.webp',
+  presenting: '/assets/vision2035/welcome.webp',
+  thinking: '/assets/vision2035/thinking.webp',
+  stage_think: '/assets/vision2035/think.webp',
+  running: '/assets/vision2035/connect.webp',
+  explore: '/assets/vision2035/look.webp',
+  cheering: '/assets/vision2035/cheerful.webp',
+  happy: '/assets/vision2035/cheerful.webp',
+  excited: '/assets/vision2035/excited.webp',
+  curious: '/assets/vision2035/look.webp',
+  surprised: '/assets/vision2035/surprised.webp',
+  confused: '/assets/vision2035/anxious.webp',
+  worried: '/assets/vision2035/anxious.webp',
+  sad: '/assets/vision2035/sad.webp',
+  angry: '/assets/vision2035/anxious.webp',
+  determined: '/assets/vision2035/think.webp',
+  sleepy: '/assets/vision2035/sleepy.webp',
+  laughing: '/assets/vision2035/cheerful.webp',
+  wink: '/assets/vision2035/sneaky.webp',
 }
 
 interface DivaMascotProps {

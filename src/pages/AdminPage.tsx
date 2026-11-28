@@ -1,3 +1,4 @@
+import { LanguageToggle, useI18n } from '@/lib/i18n'
 import React, { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
@@ -9,13 +10,16 @@ import {
   RefreshCw,
   Settings,
   ShieldAlert,
+  Users,
 } from 'lucide-react'
 import { AdminActionsTab } from '@/components/admin/AdminActionsTab'
 import { AdminDashboardTab } from '@/components/admin/AdminDashboardTab'
 import { AdminQuestionsTab } from '@/components/admin/AdminQuestionsTab'
+import { AdminParticipationTab } from '@/components/admin/AdminParticipationTab'
 import { AdminSettingsTab } from '@/components/admin/AdminSettingsTab'
 import { DivaMascot } from '@/components/diva/DivaMascot'
 import { Badge } from '@/components/ui/badge'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -31,11 +35,14 @@ import type {
 } from '@/types/quiz'
 
 export const AdminPage: React.FC = () => {
+  const { t } = useI18n()
   const navigate = useNavigate()
   const session = getActiveSession()
-  const user = session?.user
+  const user = session?.mode === (quizService.isUsingSupabase() ? 'supabase' : 'demo') &&
+    (quizService.isUsingSupabase() || quizService.isDemoAvailable()) ? session.user : undefined
 
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState('')
   const [users, setUsers] = useState<UserProfile[]>([])
   const [campaigns, setCampaigns] = useState<Campaign[]>([])
   const [questions, setQuestions] = useState<QuestionItem[]>([])
@@ -45,6 +52,7 @@ export const AdminPage: React.FC = () => {
 
   const loadSnapshot = useCallback(async () => {
     setLoading(true)
+    setLoadError('')
     try {
       const snap = await quizService.getAdminSnapshot()
       setUsers(snap.users)
@@ -53,6 +61,8 @@ export const AdminPage: React.FC = () => {
       setAttempts(snap.attempts)
       setActionLogs(snap.actionLogs)
       setAuditLogs(snap.auditLogs)
+    } catch (err) {
+      setLoadError(err instanceof Error ? err.message : 'Không thể tải dữ liệu quản trị.')
     } finally {
       setLoading(false)
     }
@@ -85,20 +95,20 @@ export const AdminPage: React.FC = () => {
             <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-red-600">
               <ShieldAlert className="h-6 w-6" />
             </div>
-            <CardTitle>403 — Không có quyền truy cập</CardTitle>
+            <CardTitle>{t("403 — Không có quyền truy cập", "403 — Access denied")}</CardTitle>
             <CardDescription>
               {user
                 ? `Tài khoản "${user.full_name}" đang ở vai trò Employee nên bị chặn vào cổng quản trị.`
-                : 'Vui lòng đăng nhập qua Cổng Bí mật với vai trò Admin, Reviewer hoặc HR.'}
+                : t("Vui lòng đăng nhập qua Cổng Bí mật với vai trò Admin, Reviewer hoặc HR.", "Sign in through the admin portal as an Admin, Reviewer or HR user.")}
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col sm:flex-row gap-2 justify-center">
             <Button asChild variant="outline">
-              <Link to="/">Về trang làm Quiz</Link>
+              <Link to="/">{t("Về trang làm Quiz", "Back to the survey")}</Link>
             </Button>
             <Button asChild>
               <Link to="/secret-login">
-                <Lock className="mr-1.5 h-4 w-4" /> Cổng Đăng nhập Bí mật
+                <Lock className="mr-1.5 h-4 w-4" /> {t("Cổng Đăng nhập Bí mật", "Admin sign-in")}
               </Link>
             </Button>
           </CardContent>
@@ -112,7 +122,7 @@ export const AdminPage: React.FC = () => {
   const canActions = user.role === 'admin' || user.role === 'hr_viewer'
   const canSettings = user.role === 'admin'
 
-  const defaultTab = canOverview ? 'overview' : 'questions'
+  const defaultTab = canOverview ? (quizService.isUsingSupabase() ? 'participation' : 'overview') : 'questions'
   const actorEmail = user.email || user.employee_code
 
   return (
@@ -137,13 +147,14 @@ export const AdminPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <LanguageToggle />
             <Button variant="outline" size="sm" onClick={loadSnapshot} disabled={loading}>
               <RefreshCw className={`mr-1.5 h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />
-              Làm mới
+              {t("Làm mới", "Refresh")}
             </Button>
             <Button asChild variant="outline" size="sm">
-              <Link to="/">Xem trang Quiz</Link>
+              <Link to="/">{t('Xem trang khảo sát', 'Open survey')}</Link>
             </Button>
             <Button
               variant="ghost"
@@ -153,7 +164,7 @@ export const AdminPage: React.FC = () => {
                 navigate('/secret-login')
               }}
             >
-              <LogOut className="mr-1.5 h-3.5 w-3.5" /> Đăng xuất
+              <LogOut className="mr-1.5 h-3.5 w-3.5" /> {t("Đăng xuất", "Sign out")}
             </Button>
           </div>
         </div>
@@ -161,29 +172,41 @@ export const AdminPage: React.FC = () => {
 
       {/* Main Content */}
       <main className="mx-auto max-w-7xl p-4 sm:p-6">
+        {loadError && <Alert variant="destructive" className="mb-4"><AlertDescription>{loadError}</AlertDescription></Alert>}
         <Tabs defaultValue={defaultTab} className="space-y-6">
           <TabsList className="flex flex-wrap h-auto gap-1 bg-neutral-200/70 p-1">
+            {canOverview && quizService.isUsingSupabase() && (
+              <TabsTrigger value="participation" className="gap-1.5">
+                <Users className="h-4 w-4" /> {t("Theo dõi nhân sự", "Participation")}
+              </TabsTrigger>
+            )}
             {canOverview && (
               <TabsTrigger value="overview" className="gap-1.5">
-                <BarChart3 className="h-4 w-4" /> Tổng quan & Giải thưởng
+                <BarChart3 className="h-4 w-4" /> {t("Tổng quan & Giải thưởng", "Overview & awards")}
               </TabsTrigger>
             )}
             {canQuestions && (
               <TabsTrigger value="questions" className="gap-1.5">
-                <BookOpenCheck className="h-4 w-4" /> Ngân hàng Câu hỏi
+                <BookOpenCheck className="h-4 w-4" /> {t("Ngân hàng Câu hỏi", "Question bank")}
               </TabsTrigger>
             )}
             {canActions && (
               <TabsTrigger value="actions" className="gap-1.5">
-                <Activity className="h-4 w-4" /> Soi Hành động (Logs)
+                <Activity className="h-4 w-4" /> {t("Nhật ký làm bài", "Attempt logs")}
               </TabsTrigger>
             )}
             {canSettings && (
               <TabsTrigger value="settings" className="gap-1.5">
-                <Settings className="h-4 w-4" /> Chiến dịch & RBAC
+                <Settings className="h-4 w-4" /> {t("Chiến dịch & RBAC", "Campaign & access")}
               </TabsTrigger>
             )}
           </TabsList>
+
+          {canOverview && quizService.isUsingSupabase() && (
+            <TabsContent value="participation">
+              <AdminParticipationTab campaigns={campaigns} canImport={canSettings} />
+            </TabsContent>
+          )}
 
           {canOverview && (
             <TabsContent value="overview">

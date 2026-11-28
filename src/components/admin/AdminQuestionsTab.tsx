@@ -1,6 +1,6 @@
+import { useI18n } from '@/lib/i18n'
 import React, { useMemo, useState } from 'react'
-import * as XLSX from 'xlsx'
-import { Check, Edit3, Eye, Plus, Upload } from 'lucide-react'
+import { Check, Edit3, Eye } from 'lucide-react'
 import { QuestionRenderer } from '@/components/quiz/QuestionRenderer'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -26,6 +26,7 @@ export const AdminQuestionsTab: React.FC<AdminQuestionsTabProps> = ({
   actorEmail,
   onRefresh,
 }) => {
+  const { t } = useI18n()
   const [search, setSearch] = useState('')
   const [stageFilter, setStageFilter] = useState<string>('ALL')
   const [statusFilter, setStatusFilter] = useState<string>('ALL')
@@ -35,6 +36,7 @@ export const AdminQuestionsTab: React.FC<AdminQuestionsTabProps> = ({
 
   const filtered = useMemo(() => {
     return questions.filter((q) => {
+      if (!/^V2035-(0[1-9]|1[0-5])$/.test(q.question_code)) return false
       if (stageFilter !== 'ALL' && q.stage !== stageFilter) return false
       if (statusFilter !== 'ALL' && q.review_status !== statusFilter) return false
       if (
@@ -65,87 +67,14 @@ export const AdminQuestionsTab: React.FC<AdminQuestionsTabProps> = ({
     }
   }
 
-  const handleNewQuestion = () => {
-    setPreviewSampleAns([])
-    setEditing({
-      question_code: `NEW${questions.length + 1}`,
-      source_set: 'Bo_Sung',
-      stage: 'LOOK',
-      concept: 'Nhận diện hình',
-      question_type: 'SINGLE_CHOICE',
-      prompt_text: '',
-      options_json: [
-        { key: 'A', text: '' },
-        { key: 'B', text: '' },
-        { key: 'C', text: '' },
-      ],
-      correct_answer_json: { keys: ['A'] },
-      explanation: '',
-      shuffle_options: true,
-      mascot_pose: 'pointing',
-      review_status: 'Chua_duyet',
-      reviewer_note: '',
-    })
-  }
-
-  const handleExcelUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    const buf = await file.arrayBuffer()
-    const wb = XLSX.read(buf)
-    const imported: QuestionItem[] = []
-    for (const sheetName of wb.SheetNames) {
-      if (!sheetName.startsWith('Bo ')) continue
-      const rows = XLSX.utils.sheet_to_json<Record<string, string>>(wb.Sheets[sheetName])
-      const sourceSet = sheetName.includes('Bo A') ? 'Bo_A' : 'Bo_B'
-      for (const r of rows) {
-        if (!r['Mã'] || !r['Câu hỏi']) continue
-        const ansClean = String(r['Đáp án đúng'] || 'A').replace('*', '').trim()
-        imported.push({
-          question_code: String(r['Mã']).trim(),
-          source_set: sourceSet,
-          stage: (String(r['Chặng'] || 'LOOK').trim() as Stage),
-          concept: String(r['Concept'] || 'Vision').trim(),
-          question_type: 'SINGLE_CHOICE',
-          prompt_text: String(r['Câu hỏi']).trim(),
-          options_json: [
-            { key: 'A', text: String(r['Đáp án A'] || '') },
-            { key: 'B', text: String(r['Đáp án B'] || '') },
-            { key: 'C', text: String(r['Đáp án C'] || '') },
-          ],
-          correct_answer_json: { keys: [ansClean] },
-          explanation: String(r['Giải thích đáp án'] || ''),
-          shuffle_options: true,
-          mascot_pose: 'pointing',
-          review_status: String(r['Đáp án đúng'] || '').includes('*') ? 'Can_chinh_sua' : 'Chua_duyet',
-          reviewer_note: String(r['Gợi ý hình ảnh / Lưu ý'] || ''),
-        })
-      }
-    }
-    if (imported.length > 0) {
-      await quizService.bulkImportQuestions(imported, actorEmail)
-      await onRefresh()
-    }
-    e.target.value = ''
-  }
-
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl font-bold">Ngân hàng Câu hỏi & Duyệt nội dung</h2>
+          <h2 className="text-xl font-bold">{t("Ngân hàng Câu hỏi & Duyệt nội dung", "Question bank & review")}</h2>
           <p className="text-sm text-muted-foreground">
-            Chỉ câu hỏi ở trạng thái <strong>Đã duyệt</strong> mới được phát cho nhân viên làm bài
+            {t("Chỉ câu hỏi ở trạng thái", "Only questions marked")} <strong>{t("Đã duyệt", "Approved")}</strong> {t("mới được phát cho nhân viên làm bài", "are available to employees")}
           </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <label className="inline-flex cursor-pointer items-center rounded-xl border bg-background px-3 py-2 text-sm font-semibold hover:bg-muted">
-            <Upload className="mr-2 h-4 w-4" /> Import Excel
-            <input type="file" accept=".xlsx,.xls" className="hidden" onChange={handleExcelUpload} />
-          </label>
-          <Button onClick={handleNewQuestion}>
-            <Plus className="mr-1.5 h-4 w-4" /> Thêm câu hỏi
-          </Button>
         </div>
       </div>
 
@@ -153,17 +82,17 @@ export const AdminQuestionsTab: React.FC<AdminQuestionsTabProps> = ({
       <Card>
         <CardContent className="p-4 flex flex-col sm:flex-row gap-3">
           <Input
-            placeholder="Tìm theo mã câu (A01, B05...) hoặc nội dung..."
+            placeholder={t("Tìm theo mã câu hoặc nội dung…", "Search by question code or text…")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="sm:max-w-xs"
           />
           <Select value={stageFilter} onValueChange={setStageFilter}>
             <SelectTrigger className="sm:w-40">
-              <SelectValue placeholder="Chặng" />
+              <SelectValue placeholder={t("Chặng", "Stage")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="ALL">Tất cả chặng</SelectItem>
+              <SelectItem value="ALL">{t("Tất cả chặng", "All stages")}</SelectItem>
               <SelectItem value="LOOK">LOOK</SelectItem>
               <SelectItem value="THINK">THINK</SelectItem>
               <SelectItem value="CONNECT">CONNECT</SelectItem>
@@ -171,13 +100,13 @@ export const AdminQuestionsTab: React.FC<AdminQuestionsTabProps> = ({
           </Select>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="sm:w-44">
-              <SelectValue placeholder="Trạng thái" />
+              <SelectValue placeholder={t("Trạng thái", "Status")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="ALL">Tất cả trạng thái</SelectItem>
-              <SelectItem value="Da_duyet">Đã duyệt</SelectItem>
-              <SelectItem value="Can_chinh_sua">Cần chỉnh sửa (*)</SelectItem>
-              <SelectItem value="Chua_duyet">Chưa duyệt</SelectItem>
+              <SelectItem value="ALL">{t("Tất cả trạng thái", "All statuses")}</SelectItem>
+              <SelectItem value="Da_duyet">{t("Đã duyệt", "Approved")}</SelectItem>
+              <SelectItem value="Can_chinh_sua">{t("Cần chỉnh sửa (*)", "Needs changes (*)")}</SelectItem>
+              <SelectItem value="Chua_duyet">{t("Chưa duyệt", "Pending review")}</SelectItem>
             </SelectContent>
           </Select>
         </CardContent>
@@ -186,17 +115,17 @@ export const AdminQuestionsTab: React.FC<AdminQuestionsTabProps> = ({
       {/* Questions Table */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-base">Danh sách câu hỏi ({filtered.length})</CardTitle>
+          <CardTitle className="text-base">{t("Danh sách câu hỏi (", "Questions (")}{filtered.length})</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Mã</TableHead>
-                <TableHead>Chặng / Kiểu</TableHead>
-                <TableHead>Nội dung</TableHead>
-                <TableHead>Trạng thái</TableHead>
-                <TableHead className="text-right">Thao tác</TableHead>
+                <TableHead>{t("Mã", "Code")}</TableHead>
+                <TableHead>{t("Chặng / Kiểu", "Stage / type")}</TableHead>
+                <TableHead>{t("Nội dung", "Question")}</TableHead>
+                <TableHead>{t("Trạng thái", "Status")}</TableHead>
+                <TableHead className="text-right">{t("Thao tác", "Actions")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -213,7 +142,7 @@ export const AdminQuestionsTab: React.FC<AdminQuestionsTabProps> = ({
                   <TableCell className="max-w-md">
                     <div className="line-clamp-2 font-medium">{q.prompt_text}</div>
                     {q.reviewer_note && (
-                      <div className="text-xs text-amber-700 mt-0.5">Lưu ý: {q.reviewer_note}</div>
+                      <div className="text-xs text-amber-700 mt-0.5">{t("Lưu ý:", "Note:")} {q.reviewer_note}</div>
                     )}
                   </TableCell>
                   <TableCell>
@@ -232,7 +161,7 @@ export const AdminQuestionsTab: React.FC<AdminQuestionsTabProps> = ({
                   <TableCell className="text-right space-x-1.5 whitespace-nowrap">
                     {q.review_status !== 'Da_duyet' && (
                       <Button size="sm" variant="outline" onClick={() => handleQuickApprove(q)}>
-                        <Check className="mr-1 h-3.5 w-3.5 text-emerald-600" /> Duyệt
+                        <Check className="mr-1 h-3.5 w-3.5 text-emerald-600" /> {t("Duyệt", "Approve")}
                       </Button>
                     )}
                     <Button
@@ -243,7 +172,7 @@ export const AdminQuestionsTab: React.FC<AdminQuestionsTabProps> = ({
                         setEditing({ ...q })
                       }}
                     >
-                      <Edit3 className="mr-1 h-3.5 w-3.5" /> Sửa / Xem
+                      <Edit3 className="mr-1 h-3.5 w-3.5" /> {t("Sửa / Xem", "Edit / view")}
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -257,21 +186,21 @@ export const AdminQuestionsTab: React.FC<AdminQuestionsTabProps> = ({
       <Dialog open={Boolean(editing)} onOpenChange={() => setEditing(null)}>
         <DialogContent className="max-w-4xl">
           <DialogHeader>
-            <DialogTitle>Chỉnh sửa & Live Preview Câu hỏi ({editing?.question_code})</DialogTitle>
+            <DialogTitle>{t("Chỉnh sửa & Live Preview Câu hỏi (", "Edit & preview question (")}{editing?.question_code})</DialogTitle>
           </DialogHeader>
           {editing && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 py-2">
               <div className="space-y-3">
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <Label>Mã câu</Label>
+                    <Label>{t("Mã câu", "Question code")}</Label>
                     <Input
                       value={editing.question_code}
                       onChange={(e) => setEditing({ ...editing, question_code: e.target.value })}
                     />
                   </div>
                   <div>
-                    <Label>Chặng</Label>
+                    <Label>{t("Chặng", "Stage")}</Label>
                     <Select
                       value={editing.stage}
                       onValueChange={(val: Stage) => setEditing({ ...editing, stage: val })}
@@ -288,7 +217,7 @@ export const AdminQuestionsTab: React.FC<AdminQuestionsTabProps> = ({
 
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <Label>Kiểu câu hỏi</Label>
+                    <Label>{t("Kiểu câu hỏi", "Question type")}</Label>
                     <Select
                       value={editing.question_type}
                       onValueChange={(val: QuestionType) => setEditing({ ...editing, question_type: val })}
@@ -300,11 +229,12 @@ export const AdminQuestionsTab: React.FC<AdminQuestionsTabProps> = ({
                         <SelectItem value="MULTI_FILL_BLANK">MULTI_FILL_BLANK</SelectItem>
                         <SelectItem value="TRUE_FALSE">TRUE_FALSE</SelectItem>
                         <SelectItem value="SPOT_DIFFERENCE">SPOT_DIFFERENCE</SelectItem>
+                        <SelectItem value="ACTION_BUILDER">ACTION_BUILDER</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div>
-                    <Label>Trạng thái duyệt</Label>
+                    <Label>{t("Trạng thái duyệt", "Review status")}</Label>
                     <Select
                       value={editing.review_status}
                       onValueChange={(val: ReviewStatus) => setEditing({ ...editing, review_status: val })}
@@ -321,7 +251,7 @@ export const AdminQuestionsTab: React.FC<AdminQuestionsTabProps> = ({
                 </div>
 
                 <div>
-                  <Label>Nội dung câu hỏi</Label>
+                  <Label>{t("Nội dung câu hỏi", "Question text")}</Label>
                   <Textarea
                     rows={3}
                     value={editing.prompt_text}
@@ -330,7 +260,7 @@ export const AdminQuestionsTab: React.FC<AdminQuestionsTabProps> = ({
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label>Các phương án trả lời</Label>
+                  <Label>{t("Các phương án trả lời", "Answer choices")}</Label>
                   {editing.options_json.map((opt, idx) => (
                     <div key={opt.key} className="flex items-center gap-2">
                       <Badge className="w-8 justify-center">{opt.key}</Badge>
@@ -348,7 +278,7 @@ export const AdminQuestionsTab: React.FC<AdminQuestionsTabProps> = ({
 
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <Label>Đáp án đúng (VD: A hoặc A,B,D)</Label>
+                    <Label>{t("Đáp án đúng (VD: A hoặc A,B,D)", "Correct keys (e.g. A or A,B,D)")}</Label>
                     <Input
                       value={editing.correct_answer_json.keys.join(',')}
                       onChange={(e) =>
@@ -366,12 +296,12 @@ export const AdminQuestionsTab: React.FC<AdminQuestionsTabProps> = ({
                       checked={editing.shuffle_options}
                       onCheckedChange={(checked) => setEditing({ ...editing, shuffle_options: checked })}
                     />
-                    <Label>Trộn thứ tự đáp án</Label>
+                    <Label>{t("Trộn thứ tự đáp án", "Shuffle choices")}</Label>
                   </div>
                 </div>
 
                 <div>
-                  <Label>Giải thích đáp án</Label>
+                  <Label>{t("Giải thích đáp án", "Answer explanation")}</Label>
                   <Textarea
                     rows={2}
                     value={editing.explanation}
@@ -383,7 +313,7 @@ export const AdminQuestionsTab: React.FC<AdminQuestionsTabProps> = ({
               {/* Live Mobile Preview */}
               <div className="rounded-2xl border-2 border-diva-ink bg-diva-parchment p-4 space-y-2">
                 <div className="flex items-center gap-1.5 text-xs font-bold uppercase text-diva-red">
-                  <Eye className="h-3.5 w-3.5" /> Live Preview giao diện người chơi
+                  <Eye className="h-3.5 w-3.5" /> {t("Live Preview giao diện người chơi", "Player preview")}
                 </div>
                 <QuestionRenderer
                   question={editing}
@@ -395,10 +325,10 @@ export const AdminQuestionsTab: React.FC<AdminQuestionsTabProps> = ({
           )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditing(null)}>
-              Hủy
+              {t("Hủy", "Cancel")}
             </Button>
             <Button disabled={saving} onClick={handleSaveEditing}>
-              {saving ? 'Đang lưu...' : 'Lưu câu hỏi'}
+              {saving ? t("Đang lưu...", "Saving…") : t("Lưu câu hỏi", "Save question")}
             </Button>
           </DialogFooter>
         </DialogContent>

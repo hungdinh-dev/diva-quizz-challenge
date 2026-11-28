@@ -1,55 +1,84 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, CheckCircle2, Clock, Compass, Play, Sparkles, UserCheck } from 'lucide-react'
+import {
+  AlertCircle, ArrowRight, BadgeCheck, CheckCircle2, Clock, Eye, Hand, IdCard, Info, Lightbulb, ListChecks,
+  MousePointerClick, Network, Play, Sparkles, Volume2, VolumeX, XCircle,
+} from 'lucide-react'
 import { DivaMascot, type DivaPose } from '@/components/diva/DivaMascot'
 import { QuestionRenderer } from '@/components/quiz/QuestionRenderer'
 import { ResultReview } from '@/components/quiz/ResultReview'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { LanguageToggle, useI18n } from '@/lib/i18n'
+import { useQuizAudio } from '@/components/quiz/useQuizAudio'
+import { localizeQuestion } from '@/data/questionEnglish'
 import { ActionTracker } from '@/services/actionTracker'
 import { getActiveSession, quizService } from '@/services/quizService'
-import type { Campaign, SafeQuestion, Stage, SubmitQuizResponse, UserProfile } from '@/types/quiz'
+import type { Campaign, QuizReviewItem, SafeQuestion, Stage, SubmitQuizResponse, UserProfile } from '@/types/quiz'
 
 type ScreenMode = 'welcome' | 'stage_intro' | 'playing' | 'result'
 
+const STAGE_ORDER: Stage[] = ['LOOK', 'THINK', 'CONNECT']
+
 const STAGE_META: Record<
   Stage,
-  { title: string; subtitle: string; badge: string; pose: DivaPose }
+  {
+    number: number
+    headline: [string, string]
+    subtitle: [string, string]
+    verb: [string, string]
+    how: [string, string]
+    pose: DivaPose
+    icon: typeof Eye
+  }
 > = {
   LOOK: {
-    title: 'Chặng 1: LOOK',
-    subtitle: 'Nhìn và nhận diện biểu tượng, màu sắc, thông điệp MMV Vision 2035',
-    badge: 'bg-diva-red text-white',
+    number: 1,
+    headline: ['Nhìn kỹ từng chi tiết', 'Look for the details'],
+    subtitle: ['Nhận diện linh vật, biểu tượng và thông điệp của MMV Vision 2035.', 'Recognize the mascot, symbols and messages of MMV Vision 2035.'],
+    verb: ['Quan sát', 'Observe'],
+    how: ['Chọn hình ảnh đúng', 'Pick the right image'],
     pose: 'explore',
+    icon: Eye,
   },
   THINK: {
-    title: 'Chặng 2: THINK',
-    subtitle: 'Hiểu sâu ý nghĩa 5X, 3C with I và tinh thần tự chủ DiVA',
-    badge: 'bg-diva-blue text-white',
-    pose: 'thinking',
+    number: 2,
+    headline: ['Hiểu điều đứng sau biểu tượng', 'Think beyond the symbols'],
+    subtitle: ['Khám phá ý nghĩa của 5X, 3C with I và tinh thần tự chủ DiVA.', 'Explore 5X, 3C with I and DiVA’s spirit of ownership.'],
+    verb: ['Suy ngẫm', 'Reflect'],
+    how: ['Chọn 1 đáp án đúng nhất', 'Choose the best answer'],
+    pose: 'stage_think',
+    icon: Lightbulb,
   },
   CONNECT: {
-    title: 'Chặng 3: CONNECT',
-    subtitle: 'Liên hệ các tình huống thực tế ngay trong công việc hằng ngày',
-    badge: 'bg-diva-green text-diva-ink',
+    number: 3,
+    headline: ['Đưa tầm nhìn vào hành động', 'Put the vision into action'],
+    subtitle: ['Kéo các nhãn phù hợp vào kế hoạch để xử lý tình huống tại nơi làm việc.', 'Drag the right actions into your plan to respond to situations at work.'],
+    verb: ['Hành động', 'Act'],
+    how: ['Kéo hoặc chạm để chọn hành động', 'Drag or tap to pick actions'],
     pose: 'running',
+    icon: Network,
   },
 }
 
+const stageClass = (stage: Stage) => 'dv-stage-' + stage.toLowerCase()
+
+const initials = (name: string) => {
+  const parts = name.trim().split(/\s+/).filter(Boolean)
+  if (!parts.length) return '?'
+  const last = parts[parts.length - 1]
+  return (parts.length > 1 ? parts[0][0] + last[0] : last.slice(0, 2)).toUpperCase()
+}
+
 export const QuizPage: React.FC = () => {
+  const { locale, t } = useI18n()
   const [screen, setScreen] = useState<ScreenMode>('welcome')
   const [employeeCode, setEmployeeCode] = useState('')
-  const [pin, setPin] = useState('')
+  const [verificationToken, setVerificationToken] = useState<string>()
   const [authError, setAuthError] = useState<string | null>(null)
   const [verifying, setVerifying] = useState(false)
 
   const [verifiedUser, setVerifiedUser] = useState<UserProfile | null>(null)
   const [campaign, setCampaign] = useState<Campaign | null>(null)
-  const [completedAttempts, setCompletedAttempts] = useState(0)
+  const [attemptUnavailable, setAttemptUnavailable] = useState(false)
   const [hasInProgress, setHasInProgress] = useState(false)
 
   const [attemptId, setAttemptId] = useState<string>('')
@@ -57,14 +86,39 @@ export const QuizPage: React.FC = () => {
   const [questions, setQuestions] = useState<SafeQuestion[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers, setAnswers] = useState<Record<string, string[]>>({})
+  const [feedback, setFeedback] = useState<Record<string, QuizReviewItem>>({})
   const [changeCounts, setChangeCounts] = useState<Record<string, number>>({})
   const [elapsedSec, setElapsedSec] = useState(0)
   const [submitting, setSubmitting] = useState(false)
   const [submitResult, setSubmitResult] = useState<SubmitQuizResponse | null>(null)
+  const audio = useQuizAudio(screen === 'stage_intro' || screen === 'playing')
+  const controls = (
+    <div className="flex items-center gap-2">
+      <LanguageToggle className="dv-pill-control" />
+      <button type="button" aria-pressed={audio.enabled} onClick={audio.toggle}
+        aria-label={audio.enabled ? t('Tắt âm thanh', 'Mute sound') : t('Bật âm thanh', 'Unmute sound')}
+        className="dv-icon-btn">
+        {audio.enabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+      </button>
+    </div>
+  )
+
+  const readableError = (message: string) => {
+    if (message === 'ATTEMPT_USED') return t('Mã nhân viên này đã sử dụng lượt khảo sát.', 'This employee ID has already used its survey attempt.')
+    if (message === 'INVALID_ANSWER') return t('Vui lòng chọn đủ đáp án hợp lệ.', 'Select the required number of valid answers.')
+    if (message === 'QUESTION_UNAVAILABLE' || message === 'QUESTION_OUT_OF_ORDER' || message === 'QUESTIONS_INCOMPLETE') {
+      return t('Hãy kiểm tra tiến độ và xác nhận lần lượt từng câu.', 'Check your progress and confirm each answer in order.')
+    }
+    if (message === 'INVALID_ATTEMPT') return t('Phiên làm bài đã hết hiệu lực.', 'Your survey session is no longer valid.')
+    if (locale === 'en' && message.startsWith('Mã nhân viên không')) return 'Employee ID not found.'
+    if (locale === 'en' && /chưa có (đợt|chiến dịch)/i.test(message)) return 'No survey is open at the moment.'
+    return message
+  }
 
   const trackerRef = useRef<ActionTracker | null>(null)
   const questionShownAtRef = useRef<number>(Date.now())
   const blurStartRef = useRef<number | null>(null)
+  const feedbackRef = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
     const sess = getActiveSession()
@@ -105,62 +159,57 @@ export const QuizPage: React.FC = () => {
 
   const currentQuestion = questions[currentIndex]
 
-  const stageQuestionsInfo = useMemo(() => {
-    if (!currentQuestion) return { posInStage: 1, stageTotal: 1 }
-    const sameStage = questions.filter((q) => q.stage === currentQuestion.stage)
-    const posInStage = sameStage.findIndex((q) => q.question_code === currentQuestion.question_code) + 1
-    return { posInStage, stageTotal: sameStage.length }
-  }, [questions, currentQuestion])
 
   const handleVerifyEmployee = async (codeOverride?: string) => {
+    if (verifying) return
     const targetCode = (codeOverride ?? employeeCode).trim()
     if (!targetCode) {
-      setAuthError('Vui lòng nhập Mã nhân viên để bắt đầu.')
+      setAuthError(t('Vui lòng nhập mã nhân viên.', 'Enter your employee ID.'))
       return
     }
     setAuthError(null)
     setVerifying(true)
     try {
-      const res = await quizService.verifyEmployee(targetCode, pin)
+      const res = await quizService.verifyEmployee(targetCode)
       if (!res.ok || !res.user || !res.campaign) {
-        setAuthError(res.error || 'Không thể xác thực nhân viên.')
+        setAuthError(res.error || t('Không thể xác thực nhân viên.', 'Could not verify the employee ID.'))
         return
       }
       setVerifiedUser(res.user)
+      setVerificationToken(res.verificationToken)
       setCampaign(res.campaign)
-      setCompletedAttempts(res.completedAttempts || 0)
+      setAttemptUnavailable(Boolean(res.attemptUnavailable || res.completedAttempts))
       setHasInProgress(Boolean(res.inProgressAttemptId))
+    } catch (err) {
+      setAuthError(err instanceof Error ? err.message : 'Không thể xác thực nhân viên.')
     } finally {
       setVerifying(false)
     }
   }
 
   const handleStartQuiz = async () => {
-    if (!verifiedUser || !campaign) return
+    if (!verifiedUser || !campaign || attemptUnavailable || verifying) return
     setAuthError(null)
     setVerifying(true)
     try {
       const deviceType = window.innerWidth < 768 ? 'Mobile' : 'Desktop'
-      const started = await quizService.startAttempt(campaign.id, verifiedUser.employee_code, deviceType)
+      const started = await quizService.startAttempt(campaign.id, verifiedUser.employee_code, deviceType, verificationToken)
+      if (!started.questions.length) throw new Error('Lượt làm bài chưa có câu hỏi.')
       setAttemptId(started.attemptId)
       setAttemptToken(started.attemptToken)
       setQuestions(started.questions)
       setAnswers(started.draftAnswers || {})
+      setFeedback(started.feedback)
       setChangeCounts({})
 
-      let startIdx = 0
-      if (started.resumed && started.questions.length > 0) {
-        const firstUnanswered = started.questions.findIndex(
-          (q) => !(started.draftAnswers?.[q.question_code]?.length)
-        )
-        startIdx = firstUnanswered >= 0 ? firstUnanswered : 0
-      }
+      const firstUnanswered = started.questions.findIndex((q) => !started.feedback[q.question_code])
+      const startIdx = firstUnanswered >= 0 ? firstUnanswered : started.questions.length - 1
       setCurrentIndex(startIdx)
       setElapsedSec(
         Math.max(0, Math.round((Date.now() - new Date(started.startedAt).getTime()) / 1000))
       )
 
-      const tracker = new ActionTracker(started.attemptId, started.attemptToken, verifiedUser.employee_code)
+      const tracker = new ActionTracker(started.attemptId, started.attemptToken, verifiedUser.employee_code, started.lastEventSeq)
       trackerRef.current = tracker
       tracker.record('SESSION_START', 'INTRO', {
         payload: {
@@ -197,7 +246,7 @@ export const QuizPage: React.FC = () => {
   }
 
   const handleSelectAnswer = (keys: string[]) => {
-    if (!currentQuestion) return
+    if (!currentQuestion || submitting || feedback[currentQuestion.question_code]) return
     const prev = answers[currentQuestion.question_code] || []
     const tracker = trackerRef.current
     if (tracker) {
@@ -224,15 +273,30 @@ export const QuizPage: React.FC = () => {
   }
 
   const handleNextOrSubmit = async () => {
-    if (!currentQuestion || !trackerRef.current) return
+    if (!currentQuestion || !trackerRef.current || submitting) return
+    setSubmitting(true)
+    setAuthError(null)
     const timeSpentMs = Date.now() - questionShownAtRef.current
     const currentSelected = answers[currentQuestion.question_code] || []
 
-    trackerRef.current.record('ANSWER_SUBMIT', currentQuestion.stage, {
-      questionCode: currentQuestion.question_code,
-      payload: { finalSelected: currentSelected },
-      timeSpentMs,
-    })
+    if (!feedback[currentQuestion.question_code]) {
+      try {
+        const result = await quizService.answerQuestion(attemptId, attemptToken, currentQuestion.question_code, currentSelected)
+        setFeedback((previous) => ({ ...previous, [result.question_code]: result }))
+        const nextAnswers = { ...answers, [result.question_code]: result.user_answer }
+        setAnswers(nextAnswers)
+        trackerRef.current.record('ANSWER_SUBMIT', currentQuestion.stage, {
+          questionCode: result.question_code, payload: { finalSelected: result.user_answer }, timeSpentMs,
+        })
+        void trackerRef.current.flush(nextAnswers)
+        audio.feedback(result.is_correct)
+      } catch (err) {
+        setAuthError(err instanceof Error ? err.message : t('Không thể chấm câu hỏi.', 'Could not check this answer.'))
+      } finally {
+        setSubmitting(false)
+      }
+      return
+    }
 
     const isLast = currentIndex >= questions.length - 1
     if (!isLast) {
@@ -240,7 +304,7 @@ export const QuizPage: React.FC = () => {
       const nextQuestion = questions[nextIdx]
       const stageChanged = nextQuestion.stage !== currentQuestion.stage
 
-      await trackerRef.current.flush(answers)
+      setSubmitting(false)
       setCurrentIndex(nextIdx)
 
       if (stageChanged) {
@@ -258,13 +322,12 @@ export const QuizPage: React.FC = () => {
       return
     }
 
-    setSubmitting(true)
     try {
       trackerRef.current.record('QUIZ_SUBMIT', 'RESULT', {
         payload: { totalQuestions: questions.length },
       })
       const pendingEvents = trackerRef.current.drainAllPending()
-      const res = await quizService.submitAttempt(attemptId, attemptToken, pendingEvents, answers)
+      const res = await quizService.submitAttempt(attemptId, attemptToken, pendingEvents)
       trackerRef.current.clearStorage()
       setSubmitResult(res)
       setScreen('result')
@@ -280,6 +343,7 @@ export const QuizPage: React.FC = () => {
       questionCode,
       payload: { filterMode },
     })
+    void trackerRef.current?.flush()
   }
 
   const formatTimer = (sec: number) => {
@@ -288,297 +352,318 @@ export const QuizPage: React.FC = () => {
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
   }
 
-  // ==================== SCREEN 1: WELCOME ====================
+  const stageCounts = useMemo(() => {
+    const counts: Record<Stage, number> = { LOOK: 0, THINK: 0, CONNECT: 0 }
+    questions.forEach((q) => { counts[q.stage] += 1 })
+    return counts
+  }, [questions])
+  const answeredCount = Object.keys(feedback).length
+  const currentGradedCode = currentQuestion && feedback[currentQuestion.question_code] ? currentQuestion.question_code : null
+
+  // Bring the grading feedback into view (it can sit below the fixed action bar on small screens)
+  useEffect(() => {
+    if (!currentGradedCode) return
+    const frame = window.requestAnimationFrame(() => feedbackRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }))
+    return () => window.cancelAnimationFrame(frame)
+  }, [currentGradedCode])
+
+  // Start each new question at the top of the page
+  useEffect(() => {
+    window.scrollTo({ top: 0 })
+  }, [currentIndex, screen])
+
+  // ==================== WELCOME ====================
   if (screen === 'welcome') {
-    const welcomePose: DivaPose = authError ? 'worried' : verifiedUser ? 'excited' : 'hero_presenting'
+    const showError = Boolean(authError)
     return (
-      <div className="min-h-screen diva-sunburst flex flex-col justify-between p-4 sm:p-6">
-        <div className="mx-auto w-full max-w-2xl my-auto animate-question-enter">
-          <Card className="overflow-hidden border-4 border-diva-ink bg-diva-parchment shadow-comic">
-            {/* Top Ribbon Header */}
-            <div className="bg-diva-red px-4 py-3 text-center border-b-4 border-diva-ink">
-              <div className="inline-flex items-center gap-2 rounded-full bg-diva-parchment px-3 py-0.5 border-2 border-diva-ink mb-1">
-                <span className="font-display text-xs font-extrabold tracking-wider text-diva-ink">
-                  MMV VISION 2035 • DiVA TEAM
-                </span>
-              </div>
-              <h1 className="font-display text-3xl sm:text-4xl font-extrabold text-diva-yellow drop-shadow-[0_2px_0_#212121]">
-                DiVA Vision Explorer
-              </h1>
-            </div>
+      <main className="dv-welcome">
+        <div className="dv-welcome-top">{controls}</div>
+        <div className="dv-welcome-main">
+          <div className="dv-welcome-art dv-enter">
+            <img src="/assets/vision2035/background.webp" alt="DiVA Vision Explorer" draggable={false} />
+          </div>
 
-            <CardContent className="p-5 sm:p-7 space-y-5">
-              <div className="flex flex-col sm:flex-row items-center gap-4">
-                <DivaMascot pose={welcomePose} size="xl" className="shrink-0" />
-                <div className="space-y-2.5 text-center sm:text-left">
-                  <div className="rounded-2xl border-2 border-diva-ink bg-white p-3.5 shadow-comic-sm">
-                    <p className="font-semibold text-diva-ink text-sm sm:text-base">
-                      {verifiedUser
-                        ? `Chào ${verifiedUser.full_name}! DiVA đã sẵn sàng đồng hành cùng bạn chinh phục 15 thử thách Vision 2035!`
-                        : '“Cùng Tắc kè DiVA khám phá Tầm nhìn MMV 2035 qua hành trình giải đố 3 chặng thú vị nhé!”'}
-                    </p>
-                  </div>
-                  <div className="flex flex-wrap justify-center sm:justify-start gap-2 text-xs">
-                    <Badge variant="outline" className="bg-white border-diva-ink/40">
-                      15 câu hỏi (5 LOOK • 6 THINK • 4 CONNECT)
-                    </Badge>
-                    <Badge variant="outline" className="bg-white border-diva-ink/40">
-                      <Clock className="mr-1 h-3 w-3 text-diva-orange" /> ~8–10 phút
-                    </Badge>
-                  </div>
-                </div>
-              </div>
+          <section className="dv-card dv-welcome-card dv-enter-2" aria-labelledby="welcome-title">
+            {!verifiedUser ? (
+              <>
+                <p className="dv-eyebrow text-diva-red">MMV Vision 2035</p>
+                <h1 id="welcome-title" className="mt-1.5 font-display text-[2rem] font-extrabold leading-[1.05] sm:text-[2.35rem]">
+                  {t('Sẵn sàng khám phá cùng DiVA?', 'Ready to explore with DiVA?')}
+                </h1>
+                <p className="mt-2.5 text-[0.95rem] leading-relaxed text-[color:var(--dv-ink-soft)]">
+                  {t('Hành trình 15 câu hỏi qua ba chặng để hiểu rõ hơn tầm nhìn MMV Vision 2035.',
+                    'A 15-question journey across three stages to discover MMV Vision 2035.')}
+                </p>
 
-              {/* Employee Identification */}
-              {!verifiedUser ? (
-                <div className="rounded-2xl border-2 border-diva-ink bg-white p-4 sm:p-5 space-y-3">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="emp-code" className="font-bold text-diva-ink">
-                      Nhập Mã nhân viên của bạn để bắt đầu
-                    </Label>
-                    <div className="flex flex-col sm:flex-row gap-2">
-                      <Input
-                        id="emp-code"
-                        value={employeeCode}
-                        onChange={(e) => setEmployeeCode(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && handleVerifyEmployee()}
-                        placeholder="Ví dụ: MMV0101"
-                        className="h-12 border-2 border-diva-ink text-base font-semibold uppercase"
-                      />
-                      <Button
-                        variant="comic"
-                        size="lg"
-                        disabled={verifying}
-                        onClick={() => handleVerifyEmployee()}
-                        className="h-12 shrink-0 btn-comic-shine"
-                      >
-                        <UserCheck className="mr-1.5 h-4 w-4" />
-                        {verifying ? 'Đang kiểm tra...' : 'Xác nhận'}
-                      </Button>
-                    </div>
-                  </div>
+                <ol className="dv-journey mt-4" aria-label={t('Ba chặng khảo sát', 'Three survey stages')}>
+                  {STAGE_ORDER.map((stage) => {
+                    const item = STAGE_META[stage]
+                    const Icon = item.icon
+                    return (
+                      <li key={stage} className={'dv-journey-item ' + stageClass(stage)}>
+                        <span className="dv-journey-icon"><Icon className="h-4 w-4" aria-hidden /></span>
+                        <span className="dv-journey-name">{stage}</span>
+                        <span className="dv-journey-desc">{t(...item.verb)}</span>
+                      </li>
+                    )
+                  })}
+                </ol>
 
-                  {!quizService.isUsingSupabase() && (
-                    <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground pt-1">
-                      <span>Mã dùng thử nhanh:</span>
-                      {['MMV0101', 'MMV0102', 'MMV0201'].map((code) => (
-                        <button
-                          key={code}
-                          type="button"
-                          onClick={() => {
-                            setEmployeeCode(code)
-                            handleVerifyEmployee(code)
-                          }}
-                          className="rounded-lg border bg-diva-parchment px-2 py-0.5 font-semibold text-diva-ink hover:bg-diva-yellow/60 transition-colors"
-                        >
-                          {code}
-                        </button>
+                <p className="mt-3.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.82rem] font-semibold text-[color:var(--dv-ink-soft)]">
+                  <span className="inline-flex items-center gap-1.5"><Clock className="h-4 w-4 text-diva-red" aria-hidden />{t('8–10 phút', '8–10 minutes')}</span>
+                  <span className="inline-flex items-center gap-1.5"><BadgeCheck className="h-4 w-4 text-diva-red" aria-hidden />{t('Một lượt mỗi nhân viên', 'One attempt per employee')}</span>
+                </p>
+
+                <form className="mt-5 space-y-2.5" noValidate onSubmit={(event) => { event.preventDefault(); void handleVerifyEmployee() }}>
+                  <label htmlFor="emp-code" className="block text-sm font-extrabold">{t('Mã nhân viên', 'Employee ID')}</label>
+                  <div className="dv-field">
+                    <IdCard aria-hidden />
+                    <input id="emp-code" className="dv-input" value={employeeCode} autoComplete="off" autoCapitalize="characters"
+                      spellCheck={false} placeholder={t('Ví dụ: MMV0101', 'e.g. MMV0101')} aria-invalid={showError}
+                      aria-describedby={showError ? 'emp-error' : undefined}
+                      onChange={(event) => { setEmployeeCode(event.target.value); if (authError) setAuthError(null) }} />
+                  </div>
+                  {showError && (
+                    <p id="emp-error" role="alert" className="dv-error"><AlertCircle aria-hidden />{readableError(authError!)}</p>
+                  )}
+                  <button type="submit" className="dv-btn dv-btn-block dv-btn-lg" disabled={verifying}>
+                    {verifying ? t('Đang kiểm tra…', 'Checking…') : t('Tiếp tục', 'Continue')}
+                    {!verifying && <ArrowRight className="h-5 w-5" aria-hidden />}
+                  </button>
+                  {quizService.isDemoAvailable() && (
+                    <div className="flex flex-wrap items-center gap-1.5 pt-1 text-xs font-semibold text-[color:var(--dv-ink-soft)]">
+                      <span>{t('Mã dùng thử:', 'Demo IDs:')}</span>
+                      {['MMV0101', 'MMV0102', 'MMV0202'].map((code) => (
+                        <button key={code} type="button" className="dv-demo-chip"
+                          onClick={() => { setEmployeeCode(code); void handleVerifyEmployee(code) }}>{code}</button>
                       ))}
                     </div>
                   )}
-                </div>
-              ) : (
-                <div className="rounded-2xl border-2 border-diva-ink bg-white p-4 sm:p-5 space-y-4 animate-question-enter">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <div>
-                      <p className="text-xs font-bold uppercase text-emerald-700 flex items-center gap-1">
-                        <CheckCircle2 className="h-3.5 w-3.5" /> Đã xác nhận nhân viên
-                      </p>
-                      <p className="text-lg font-bold text-diva-ink">
-                        {verifiedUser.full_name} ({verifiedUser.employee_code})
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        Bộ phận: {verifiedUser.department} • Đã hoàn thành: {completedAttempts} lượt
-                      </p>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        setVerifiedUser(null)
-                        setPin('')
-                      }}
-                    >
-                      Đổi mã khác
-                    </Button>
+                </form>
+              </>
+            ) : (
+              <div className="dv-enter">
+                <p className="dv-eyebrow text-diva-red">{t('Đã xác nhận', 'Verified')}</p>
+                <h1 id="welcome-title" className="mt-1.5 font-display text-[2rem] font-extrabold leading-[1.05]">
+                  {t('Xin chào, ', 'Hello, ')}{verifiedUser.full_name.split(/\s+/).slice(-1)[0]}!
+                </h1>
+                <div className="dv-profile mt-4">
+                  <span className="dv-avatar" aria-hidden>{initials(verifiedUser.full_name)}</span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-extrabold">{verifiedUser.full_name}</p>
+                    <p className="text-sm font-semibold leading-snug text-[color:var(--dv-ink-soft)]">{verifiedUser.employee_code}</p>
+                    {verifiedUser.department && (
+                      <p className="text-sm font-semibold leading-snug text-[color:var(--dv-ink-soft)]">{verifiedUser.department}</p>
+                    )}
                   </div>
-
-                  {completedAttempts === 0 ? (
-                    <Alert variant="success">
-                      <AlertDescription>
-                        Đây là <strong>lượt đầu tiên</strong> — kết quả sẽ được tính chính thức cho giải thưởng{' '}
-                        <strong>Vision Champion</strong> & <strong>Vision Engagement</strong>.
-                      </AlertDescription>
-                    </Alert>
-                  ) : (
-                    <Alert variant="warning">
-                      <AlertDescription>
-                        Bạn đã hoàn thành lượt tính giải trước đó. Lượt này là <strong>lượt ôn tập kiến thức Vision</strong>.
-                      </AlertDescription>
-                    </Alert>
-                  )}
-
-                  <Button
-                    variant="comic"
-                    size="xl"
-                    className="w-full text-lg btn-comic-shine"
-                    disabled={verifying}
-                    onClick={handleStartQuiz}
-                  >
-                    <Play className="mr-2 h-5 w-5 fill-current" />
-                    {hasInProgress ? 'TIẾP TỤC BÀI ĐANG LÀM' : 'BẮT ĐẦU KHÁM PHÁ'}
-                  </Button>
+                  <CheckCircle2 className="h-6 w-6 shrink-0 text-[color:var(--dv-ok)]" aria-hidden />
                 </div>
-              )}
 
-              {authError && (
-                <Alert variant="destructive">
-                  <AlertDescription>{authError}</AlertDescription>
-                </Alert>
-              )}
-            </CardContent>
-          </Card>
+                {attemptUnavailable ? (
+                  <p className="dv-notice mt-4"><Info aria-hidden />{t('Mã nhân viên này đã sử dụng lượt khảo sát. Cảm ơn bạn đã tham gia!', 'This employee ID has already used its survey attempt. Thank you for taking part!')}</p>
+                ) : (
+                  <>
+                    <p className="mt-5 text-sm font-extrabold">{t('Cách tham gia', 'How it works')}</p>
+                    <ol className="dv-howto mt-2">
+                      <li>{t('Chọn đáp án cho từng câu hỏi', 'Choose an answer for each question')}</li>
+                      <li>{t('Bấm “Xác nhận” để xem đúng / sai ngay', 'Press “Check answer” to see the result instantly')}</li>
+                      <li>{t('Đáp án đã xác nhận không thể sửa lại', 'Confirmed answers can’t be changed')}</li>
+                    </ol>
+                    <button type="button" className="dv-btn dv-btn-block dv-btn-lg mt-5" disabled={verifying} onClick={handleStartQuiz}>
+                      <Play className="h-5 w-5 fill-current" aria-hidden />
+                      {verifying ? t('Đang chuẩn bị…', 'Preparing…') : hasInProgress ? t('Tiếp tục bài đang làm', 'Resume survey') : t('Bắt đầu khảo sát', 'Start survey')}
+                    </button>
+                  </>
+                )}
+                {authError && <p role="alert" className="dv-error mt-3"><AlertCircle aria-hidden />{readableError(authError)}</p>}
+                <div className="mt-4 text-center">
+                  <button type="button" className="dv-link-btn" onClick={() => {
+                    setVerifiedUser(null); setVerificationToken(undefined); setAuthError(null)
+                  }}>{t('Không phải bạn? Dùng mã khác', 'Not you? Use another ID')}</button>
+                </div>
+              </div>
+            )}
+          </section>
         </div>
-
-        <footer className="mt-6 text-center text-xs text-white/75 flex items-center justify-center gap-3">
-          <span>MMV Vision 2035 — DiVA Explorer</span>
-          <span>•</span>
-          <Link to="/secret-login" className="opacity-70 hover:opacity-100 underline underline-offset-2">
-            Cổng Kiểm tra & Quản trị
-          </Link>
+        <footer className="dv-welcome-footer">
+          <Link to="/secret-login" className="underline underline-offset-4">{t('Cổng quản trị', 'Admin portal')}</Link>
         </footer>
-      </div>
+      </main>
     )
   }
 
-  // ==================== SCREEN 2: STAGE INTRO ====================
-  if (screen === 'stage_intro' && currentQuestion) {
-    const meta = STAGE_META[currentQuestion.stage]
-    return (
-      <div className="min-h-screen diva-sky-bg flex items-center justify-center p-4">
-        <Card className="w-full max-w-lg border-4 border-diva-ink bg-diva-parchment shadow-comic text-center animate-question-enter">
-          <CardContent className="p-6 sm:p-8 space-y-5">
-            <div className={`inline-block rounded-full border-2 border-diva-ink px-5 py-1.5 font-display text-lg font-extrabold shadow-comic-sm ${meta.badge}`}>
-              {meta.title}
-            </div>
-            <div className="flex justify-center">
-              <DivaMascot pose={meta.pose} size="xl" />
-            </div>
-            <p className="text-base sm:text-lg font-semibold text-diva-ink">{meta.subtitle}</p>
-            <Button variant="comic" size="xl" className="w-full btn-comic-shine" onClick={enterPlayingCurrentQuestion}>
-              <Compass className="mr-2 h-5 w-5" /> Bắt đầu {meta.title}
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
-
-  // ==================== SCREEN 4: RESULT ====================
+  // ==================== RESULT ====================
   if (screen === 'result' && submitResult && verifiedUser) {
     return (
-      <div className="min-h-screen diva-sky-bg p-4 sm:p-6">
-        <ResultReview
-          result={submitResult}
-          employeeName={`${verifiedUser.full_name} (${verifiedUser.employee_code})`}
-          department={verifiedUser.department}
-          onViewExplanation={handleViewExplanation}
-          onPlayAgain={() => {
-            setSubmitResult(null)
-            setScreen('welcome')
-            handleVerifyEmployee(verifiedUser.employee_code)
-          }}
-        />
-      </div>
+      <ResultReview result={submitResult} controls={controls} employeeName={verifiedUser.full_name}
+        employeeCode={verifiedUser.employee_code} department={verifiedUser.department}
+        onViewExplanation={handleViewExplanation} onReturnHome={() => {
+          setVerifiedUser(null); setSubmitResult(null); setVerificationToken(undefined); setScreen('welcome')
+        }} />
     )
   }
 
-  // ==================== SCREEN 3: PLAYING ====================
   if (!currentQuestion) return null
-  const meta = STAGE_META[currentQuestion.stage]
-  const currentSelected = answers[currentQuestion.question_code] || []
-  const canProceed =
-    currentQuestion.question_type === 'MULTI_FILL_BLANK'
-      ? currentSelected.length >= (currentQuestion.prompt_text.match(/\{\{blank_\d+\}\}/g)?.length || 1)
-      : currentSelected.length > 0
+  const stage = currentQuestion.stage
+  const meta = STAGE_META[stage]
+  const StageIcon = meta.icon
 
-  return (
-    <div className="min-h-screen diva-sky-bg flex flex-col justify-between p-3 sm:p-6">
-      <div className="mx-auto w-full max-w-3xl space-y-4">
-        {/* Top Stage Ribbon + Progress Dots */}
-        <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border-2 border-diva-ink bg-diva-parchment px-3.5 py-2.5 shadow-comic-sm">
-          <div className="flex items-center gap-2">
-            <span className={`rounded-xl border-2 border-diva-ink px-3 py-1 font-display text-sm sm:text-base font-extrabold ${meta.badge}`}>
-              {meta.title}
-            </span>
-            <span className="text-xs sm:text-sm font-bold text-diva-ink">
-              Câu {currentIndex + 1} / {questions.length}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <div className="hidden sm:flex items-center gap-1.5">
-              {Array.from({ length: stageQuestionsInfo.stageTotal }).map((_, i) => (
-                <span
-                  key={i}
-                  className={`h-3 w-3 rounded-full border border-diva-ink transition-all duration-300 ${
-                    i + 1 < stageQuestionsInfo.posInStage
-                      ? 'bg-diva-green scale-100'
-                      : i + 1 === stageQuestionsInfo.posInStage
-                        ? 'bg-diva-yellow scale-125 ring-2 ring-diva-orange/50'
-                        : 'bg-white'
-                  }`}
-                />
+  // ==================== STAGE INTRO ====================
+  if (screen === 'stage_intro') {
+    const currentOrder = STAGE_ORDER.indexOf(stage)
+    return (
+      <main className={'dv-stage ' + stageClass(stage)}>
+        <header className="dv-stage-top">
+          <span className="dv-brand"><img src="/assets/vision2035/welcome.webp" alt="" aria-hidden /><span className="hidden sm:inline">DiVA Vision Explorer</span></span>
+          {controls}
+        </header>
+        <div className="dv-stage-main">
+          <section className="dv-enter-2">
+            <ol className="dv-steps" aria-label={t('Tiến độ theo chặng', 'Stage progress')}>
+              {STAGE_ORDER.map((item, idx) => (
+                <React.Fragment key={item}>
+                  {idx > 0 && <li aria-hidden className="dv-step-line" />}
+                  <li className={'dv-step ' + (idx < currentOrder ? 'is-done' : idx === currentOrder ? 'is-current' : '')}
+                    aria-current={idx === currentOrder ? 'step' : undefined}>
+                    <span className="dv-step-dot">{idx < currentOrder ? <CheckCircle2 className="h-4 w-4" aria-hidden /> : idx + 1}</span>
+                    <span className="dv-step-label">{item}</span>
+                  </li>
+                </React.Fragment>
               ))}
+            </ol>
+
+            <p className="dv-eyebrow mt-7 text-[color:var(--stage-light)]">
+              {t('Chặng', 'Stage')} {meta.number} / {STAGE_ORDER.length} · {stage}
+            </p>
+            <h1 className="dv-stage-title mt-2 max-w-xl">{t(...meta.headline)}</h1>
+            <p className="mt-4 max-w-md text-base leading-relaxed text-white/85 sm:text-lg">{t(...meta.subtitle)}</p>
+
+            <div className="dv-stage-facts mt-6">
+              <span className="dv-fact"><ListChecks aria-hidden />{stageCounts[stage]} {t('câu hỏi', 'questions')}</span>
+              <span className="dv-fact">{stage === 'CONNECT' ? <Hand aria-hidden /> : <MousePointerClick aria-hidden />}{t(...meta.how)}</span>
             </div>
-            <Badge variant="outline" className="bg-white border-diva-ink/40 font-mono">
-              <Clock className="mr-1 h-3.5 w-3.5 text-diva-orange" />
-              {formatTimer(elapsedSec)}
-            </Badge>
+
+            <button type="button" className="dv-btn dv-btn-lg mt-8" onClick={enterPlayingCurrentQuestion}>
+              {currentOrder === 0 && answeredCount === 0 ? t('Bắt đầu chặng ', 'Start ') : t('Vào chặng ', 'Enter ')}{stage}
+              <ArrowRight className="h-5 w-5" aria-hidden />
+            </button>
+
+            {answeredCount > 0 && (
+              <div className="dv-overall mt-7">
+                <span>{t('Đã hoàn thành', 'Completed')} {answeredCount}/{questions.length}</span>
+                <span className="dv-overall-bar"><span style={{ width: (answeredCount / questions.length) * 100 + '%' }} /></span>
+              </div>
+            )}
+          </section>
+
+          <div className="dv-stage-art dv-enter" aria-hidden="true">
+            <div className="dv-stage-disc">
+              <DivaMascot pose={meta.pose} size="xl" className="!h-[94%] !w-[94%]" />
+            </div>
+            <span className="dv-stage-badge"><span><small>{t('CHẶNG', 'STAGE')}</small><b>0{meta.number}</b></span></span>
           </div>
         </div>
+      </main>
+    )
+  }
 
-        {/* Main Question Card */}
-        <Card className="border-4 border-diva-ink bg-diva-parchment shadow-comic">
-          <CardContent className="p-4 sm:p-6">
-            <QuestionRenderer
-              question={currentQuestion}
-              questionIndex={currentIndex}
-              selectedKeys={currentSelected}
-              changeCount={changeCounts[currentQuestion.question_code] || 0}
-              onSelect={handleSelectAnswer}
-            />
-          </CardContent>
-        </Card>
+  // ==================== PLAYING ====================
+  const graded = feedback[currentQuestion.question_code]
+  const shownQuestion = localizeQuestion(currentQuestion, locale)
+  const currentSelected = graded?.user_answer ?? answers[currentQuestion.question_code] ?? []
+  const required = currentQuestion.question_type === 'ACTION_BUILDER'
+    ? currentQuestion.options_json[0]?.selectionLimit ?? 1
+    : 1
+  const canProceed = Boolean(graded) || currentSelected.length === required
+  const correctLabels = graded?.correct_answer.map((key) => shownQuestion.options_json.find((option) => option.key === key)?.text ?? key)
+  const isLast = currentIndex === questions.length - 1
+  const nextStageChanges = !isLast && questions[currentIndex + 1]?.stage !== stage
 
-        {authError && (
-          <Alert variant="destructive">
-            <AlertDescription>{authError}</AlertDescription>
-          </Alert>
+  const hint = graded
+    ? (graded.is_correct ? t('Tuyệt vời! Tiếp tục nào.', 'Great job! Let’s keep going.') : t('Không sao, xem đáp án rồi đi tiếp nhé.', 'No worries — check the answer and move on.'))
+    : currentQuestion.question_type === 'ACTION_BUILDER'
+      ? t('Đã chọn ' + currentSelected.length + '/' + required + ' hành động', currentSelected.length + '/' + required + ' actions selected')
+      : currentSelected.length
+        ? t('Bấm “Xác nhận” để kiểm tra', 'Press “Check answer” to continue')
+        : t('Chọn 1 đáp án', 'Choose one answer')
+
+  let segIndex = -1
+  return (
+    <main className={'dv-play ' + stageClass(stage)}>
+      <header className="dv-topbar">
+        <div className="dv-topbar-inner">
+          <div className="flex min-w-0 items-center gap-2.5">
+            <span className="dv-stage-chip"><StageIcon aria-hidden />{stage}</span>
+            <span className="whitespace-nowrap text-sm font-extrabold">
+              {t('Câu', 'Q')} {currentIndex + 1}<span className="text-[color:var(--dv-ink-soft)]">/{questions.length}</span>
+            </span>
+          </div>
+          <div className="dv-progress" role="progressbar" aria-valuemin={0} aria-valuemax={questions.length} aria-valuenow={answeredCount}
+            aria-label={t('Tiến độ khảo sát', 'Survey progress')}>
+            {STAGE_ORDER.filter((s) => stageCounts[s] > 0).map((s) => (
+              <div key={s} className="dv-progress-group" style={{ '--n': stageCounts[s] } as React.CSSProperties}>
+                {questions.filter((q) => q.stage === s).map((q) => {
+                  segIndex += 1
+                  const done = Boolean(feedback[q.question_code])
+                  const current = segIndex === currentIndex
+                  return (
+                    <span key={q.question_code}
+                      className={'dv-progress-seg ' + (current && !done ? 'is-current' : done ? 'is-done' : '')}
+                      style={{ '--seg-color': 'var(--dv-' + s.toLowerCase() + ')' } as React.CSSProperties} />
+                  )
+                })}
+              </div>
+            ))}
+          </div>
+          <div className="flex items-center gap-2.5">
+            <span className="dv-timer hidden sm:inline-flex" aria-label={t('Thời gian', 'Time')}><Clock className="h-4 w-4" aria-hidden />{formatTimer(elapsedSec)}</span>
+            {controls}
+          </div>
+        </div>
+      </header>
+
+      <div className="dv-play-main">
+        <QuestionRenderer key={currentQuestion.question_code} question={shownQuestion} questionIndex={currentIndex}
+          questionNumber={currentIndex + 1} selectedKeys={currentSelected}
+          changeCount={changeCounts[currentQuestion.question_code] || 0}
+          correctKeys={graded?.correct_answer} disabled={Boolean(graded) || submitting} onSelect={handleSelectAnswer} />
+
+        {graded && (
+          <section ref={feedbackRef} role="status" className={'dv-feedback ' + (graded.is_correct ? 'is-correct' : 'is-incorrect')}>
+            <DivaMascot pose={graded.is_correct ? 'cheering' : 'sad'} size="sm" className="dv-feedback-mascot" />
+            <div className="min-w-0">
+              <h2 className="dv-feedback-title flex items-center gap-2">
+                {graded.is_correct ? <CheckCircle2 className="h-6 w-6" aria-hidden /> : <XCircle className="h-6 w-6" aria-hidden />}
+                {graded.is_correct ? t('Chính xác!', 'Correct!') : t('Chưa chính xác', 'Not quite')}
+              </h2>
+              {!graded.is_correct && correctLabels && (
+                <p className="mt-1.5 text-[0.95rem] font-semibold">
+                  {t('Đáp án đúng', 'Correct answer')}: <span className="font-extrabold">{correctLabels.join(' · ')}</span>
+                </p>
+              )}
+              {locale === 'vi' && graded.stage === 'CONNECT' && graded.explanation && (
+                <p className="mt-1.5 text-sm leading-relaxed">{graded.explanation}</p>
+              )}
+            </div>
+          </section>
         )}
 
-        {/* Action Bar */}
-        <div className="flex items-center justify-between gap-3 pt-1">
-          <div className="text-xs text-diva-ink/70 font-medium flex items-center gap-1">
-            <Sparkles className="h-3.5 w-3.5 text-diva-orange" />
-            <span>Tự động lưu từng hành động</span>
-          </div>
-          <Button
-            variant="comicRed"
-            size="lg"
-            disabled={!canProceed || submitting}
-            onClick={handleNextOrSubmit}
-            className="min-w-[180px] btn-comic-shine"
-          >
-            {submitting
-              ? 'Đang chấm điểm...'
-              : currentIndex >= questions.length - 1
-                ? 'Hoàn thành & Xem điểm'
-                : 'Câu tiếp theo'}
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
-        </div>
+        {authError && <p role="alert" className="dv-error mt-4"><AlertCircle aria-hidden />{readableError(authError)}</p>}
       </div>
-    </div>
+
+      <footer className="dv-actionbar">
+        <div className="dv-actionbar-inner">
+          <p className="dv-hint" aria-live="polite">
+            {graded ? (graded.is_correct ? <Sparkles className="text-diva-orange" aria-hidden /> : <Info aria-hidden />) : <MousePointerClick aria-hidden />}
+            <span className="line-clamp-2">{hint}</span>
+          </p>
+          <button type="button" className={'dv-btn ' + (graded ? 'dv-btn-ink' : '')} disabled={!canProceed || submitting} onClick={handleNextOrSubmit}>
+            {submitting ? t('Đang xử lý…', 'Working…') : !graded ? t('Xác nhận', 'Check answer')
+              : isLast ? t('Xem kết quả', 'See results') : nextStageChanges ? t('Sang chặng tiếp', 'Next stage') : t('Câu tiếp theo', 'Next')}
+            {!submitting && <ArrowRight className="h-5 w-5" aria-hidden />}
+          </button>
+        </div>
+      </footer>
+    </main>
   )
 }
